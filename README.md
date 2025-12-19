@@ -1,15 +1,19 @@
 <!-- Hackers Unity – Official Website README -->
 
 <div align="center">
-  <!-- Project Logo -->
-  <!-- Replace src with your actual logo URL if available -->
-  <img src="https://placehold.co/180x180?text=Hackers+Unity" alt="Hackers Unity Logo" width="140" height="140" />
+  <!-- Official Logo -->
+  <img
+    src="https://i.postimg.cc/3rb36xyW/Hacker-s-Unity-Logo.png"
+    alt="Hackers Unity Logo"
+    width="140"
+    height="140"
+  />
 
   <h1>Hackers Unity – Official Website</h1>
 
   <p>
-    A modern, scalable web platform powering the Hackers Unity tech community —
-    built for event management, hackathon registrations, and community engagement.
+    The official digital platform of Hackers Unity — designed to power
+    hackathons, workshops, and community-driven technology initiatives.
   </p>
 </div>
 
@@ -26,14 +30,15 @@
   </h2>
 
   <p>
-    <strong>Hackers Unity</strong> is a student-driven technology community based in India,
-    focused on empowering developers, innovators, and technology enthusiasts through
-    real-world exposure and collaborative learning.
+    <strong>Hackers Unity</strong> is a student-led technology community in India,
+    built to empower developers, innovators, and technology enthusiasts through
+    hands-on learning, collaboration, and real-world exposure.
   </p>
 
   <p>
-    The platform serves as the official digital hub for managing hackathons, workshops,
-    webinars, and community-led tech initiatives.
+    This website serves as the official hub for managing community events,
+    hackathon registrations, workshops, webinars, and participant engagement
+    at scale.
   </p>
 </section>
 
@@ -44,30 +49,31 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <polygon points="12 2 19 21 5 21 12 2"></polygon>
     </svg>
-    Core Features
+    Platform Capabilities
   </h2>
 
   <h3>User Experience</h3>
   <ul>
     <li>Secure user authentication and onboarding</li>
-    <li>Event and hackathon registration system</li>
+    <li>Event and hackathon registration workflows</li>
     <li>Automated email confirmations</li>
-    <li>Responsive, accessible, and SEO-friendly UI</li>
+    <li>Modern, responsive, and accessible interface</li>
+    <li>SEO-optimized page structure</li>
   </ul>
 
-  <h3>Admin Capabilities</h3>
+  <h3>Administrative Features</h3>
   <ul>
-    <li>Complete role-based admin management system</li>
+    <li>Comprehensive role-based admin system</li>
     <li>User profile and registration tracking</li>
     <li>Event participation analytics</li>
-    <li>Automated registration counters using database triggers</li>
+    <li>Database-level automation using SQL triggers</li>
   </ul>
 
-  <h3>Email & Communication</h3>
+  <h3>Communication</h3>
   <ul>
-    <li>Transactional emails powered by Resend</li>
+    <li>Transactional email system powered by Resend</li>
     <li>Registration confirmation emails</li>
-    <li>Extensible system for future announcements</li>
+    <li>Extensible architecture for future announcements</li>
   </ul>
 </section>
 
@@ -144,74 +150,19 @@ simple-tic-tac-toe-main/
 <section>
   <h2>
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 2v20"></path>
-      <path d="M2 12h20"></path>
-    </svg>
-    Installation & Setup
-  </h2>
-
-  <h3>Clone Repository</h3>
-  <pre>
-git clone https://github.com/your-username/hackers-unity-website.git
-cd hackers-unity-website
-  </pre>
-
-  <h3>Install Dependencies</h3>
-  <pre>
-npm install
-# or
-bun install
-  </pre>
-
-  <h3>Environment Variables</h3>
-  <pre>
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-RESEND_API_KEY=your_resend_api_key
-  </pre>
-</section>
-
-<hr />
-
-<section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M5 12h14"></path>
-      <path d="M12 5l7 7-7 7"></path>
-    </svg>
-    Running the Project
-  </h2>
-
-  <pre>
-npm run dev
-# or
-bun dev
-  </pre>
-
-  <p>
-    The application will be available at:
-    <strong>http://localhost:5173</strong>
-  </p>
-</section>
-
-<hr />
-
-<section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 1l3 5 5 3-5 3-3 5-3-5-5-3 5-3 3-5z"></path>
     </svg>
-    Deployment
+    Deployment Readiness
   </h2>
 
   <p>
-    This project is deployment-ready and can be hosted on platforms such as
-    Vercel, Netlify, or any VPS supporting Node.js.
+    The Hackers Unity website is production-ready and designed for deployment on
+    modern hosting platforms such as Vercel, Netlify, or cloud-based VPS
+    environments supporting Node.js.
   </p>
 
   <p>
-    Ensure all environment variables are configured correctly in the deployment
-    environment.
+    The architecture emphasizes scalability, security, and maintainability.
   </p>
 </section>
 
@@ -228,7 +179,8 @@ bun dev
 
   <p>
     This project is proprietary and owned by <strong>Hackers Unity</strong>.
-    Unauthorized redistribution or commercial use is strictly prohibited.
+    Unauthorized redistribution, modification, or commercial use is strictly
+    prohibited.
   </p>
 </section>
 
@@ -240,13 +192,19 @@ bun dev
       <path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 1118 0z"></path>
       <circle cx="12" cy="10" r="3"></circle>
     </svg>
-    Contact
+    Contact & Community
   </h2>
 
   <p>
     <strong>Hackers Unity</strong><br />
-    Official Tech Community Platform<br />
-    Email: official Hackers Unity email<br />
-    LinkedIn & Socials: Hacker’s Unity
+    Official Technology Community Platform<br />
+    LinkedIn:
+    <a
+      href="https://www.linkedin.com/company/hackerunity/posts/?feedView=all"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      https://www.linkedin.com/company/hackerunity
+    </a>
   </p>
 </section>
