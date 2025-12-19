@@ -1,91 +1,89 @@
-<!-- Hackers Unity – Official Website README -->
+<!--
+  Hackers Unity – Official Website
+  Proprietary Repository
+-->
 
 <div align="center">
-  <!-- Official Logo -->
+  <!-- Official Hackers Unity Logo -->
   <img
     src="https://i.postimg.cc/3rb36xyW/Hacker-s-Unity-Logo.png"
-    alt="Hackers Unity Logo"
-    width="140"
-    height="140"
+    alt="Hackers Unity Official Logo"
+    width="160"
   />
 
   <h1>Hackers Unity – Official Website</h1>
 
   <p>
-    The official digital platform of Hackers Unity — designed to power
-    hackathons, workshops, and community-driven technology initiatives.
+    The official digital platform of <strong>Hackers Unity</strong>, designed to
+    power hackathons, workshops, and community-driven technology initiatives.
+  </p>
+
+  <p>
+    <em>
+      This repository is proprietary. Unauthorized use, copying, or distribution
+      is strictly prohibited.
+    </em>
   </p>
 </div>
 
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-    About Hackers Unity
-  </h2>
+  <h2>About Hackers Unity</h2>
 
   <p>
-    <strong>Hackers Unity</strong> is a student-led technology community in India,
-    built to empower developers, innovators, and technology enthusiasts through
-    hands-on learning, collaboration, and real-world exposure.
+    <strong>Hackers Unity</strong> is a student-led technology community in India
+    focused on empowering developers, innovators, and technology enthusiasts
+    through real-world exposure, collaboration, and skill-driven learning.
   </p>
 
   <p>
-    This website serves as the official hub for managing community events,
-    hackathon registrations, workshops, webinars, and participant engagement
-    at scale.
+    Hackers Unity organizes hackathons, workshops, webinars, and technical events,
+    connecting students with practical opportunities and industry-level
+    experiences.
+  </p>
+
+  <p>
+    This website serves as the <strong>official and exclusive digital platform</strong>
+    for managing community events, participant registrations, communications,
+    and administrative operations.
   </p>
 </section>
 
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polygon points="12 2 19 21 5 21 12 2"></polygon>
-    </svg>
-    Platform Capabilities
-  </h2>
+  <h2>Platform Capabilities</h2>
 
   <h3>User Experience</h3>
   <ul>
-    <li>Secure user authentication and onboarding</li>
+    <li>Secure authentication and onboarding</li>
     <li>Event and hackathon registration workflows</li>
-    <li>Automated email confirmations</li>
-    <li>Modern, responsive, and accessible interface</li>
-    <li>SEO-optimized page structure</li>
+    <li>Automated confirmation emails</li>
+    <li>Responsive, accessible, and modern UI</li>
+    <li>SEO-optimized structure</li>
   </ul>
 
-  <h3>Administrative Features</h3>
+  <h3>Administrative Capabilities</h3>
   <ul>
-    <li>Comprehensive role-based admin system</li>
+    <li>Role-based admin access control</li>
     <li>User profile and registration tracking</li>
-    <li>Event participation analytics</li>
-    <li>Database-level automation using SQL triggers</li>
+    <li>Event analytics and participation insights</li>
+    <li>Automated counters and validation using database triggers</li>
   </ul>
 
-  <h3>Communication</h3>
+  <h3>Communication System</h3>
   <ul>
-    <li>Transactional email system powered by Resend</li>
-    <li>Registration confirmation emails</li>
-    <li>Extensible architecture for future announcements</li>
+    <li>Transactional email delivery using Resend</li>
+    <li>Registration confirmation workflows</li>
+    <li>Scalable architecture for future announcements</li>
   </ul>
 </section>
 
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-    </svg>
-    Technology Stack
-  </h2>
+  <h2>Technology Stack</h2>
 
   <h3>Frontend</h3>
   <ul>
@@ -101,7 +99,7 @@
     <li>SQL migrations, triggers, and functions</li>
   </ul>
 
-  <h3>Tooling</h3>
+  <h3>Development Tooling</h3>
   <ul>
     <li>ESLint</li>
     <li>PostCSS</li>
@@ -112,14 +110,7 @@
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M3 3h18v18H3z"></path>
-      <path d="M3 9h18"></path>
-      <path d="M9 21V9"></path>
-    </svg>
-    Project Structure
-  </h2>
+  <h2>Project Structure</h2>
 
   <pre>
 simple-tic-tac-toe-main/
@@ -148,52 +139,73 @@ simple-tic-tac-toe-main/
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 1l3 5 5 3-5 3-3 5-3-5-5-3 5-3 3-5z"></path>
-    </svg>
-    Deployment Readiness
-  </h2>
+  <h2>Deployment Readiness</h2>
 
   <p>
-    The Hackers Unity website is production-ready and designed for deployment on
-    modern hosting platforms such as Vercel, Netlify, or cloud-based VPS
-    environments supporting Node.js.
+    This platform is production-ready and designed for deployment on modern
+    hosting environments such as Vercel, Netlify, or cloud-based VPS
+    infrastructures that support Node.js.
   </p>
 
   <p>
-    The architecture emphasizes scalability, security, and maintainability.
+    The system emphasizes scalability, security, maintainability, and long-term
+    growth.
   </p>
 </section>
 
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-      <path d="M9 9h6v6H9z"></path>
-    </svg>
-    License
-  </h2>
+  <h2>Intellectual Property & Usage Restrictions</h2>
 
   <p>
-    This project is proprietary and owned by <strong>Hackers Unity</strong>.
-    Unauthorized redistribution, modification, or commercial use is strictly
-    prohibited.
+    © <strong>Hackers Unity</strong>. All rights reserved.
+  </p>
+
+  <p>
+    This repository, including but not limited to its source code, UI design,
+    database schema, documentation, workflows, branding assets, and logo, is the
+    <strong>exclusive intellectual property of Hackers Unity</strong>.
+  </p>
+
+  <h3>Code Usage Policy</h3>
+  <ul>
+    <li>This project is <strong>NOT open-source</strong>.</li>
+    <li>No license is granted to copy, modify, distribute, or reuse this code.</li>
+    <li>Use of this code for personal, educational, or commercial purposes is prohibited.</li>
+    <li>Derivatives, forks, or reuploads are not permitted.</li>
+  </ul>
+
+  <h3>Logo & Brand Protection</h3>
+  <ul>
+    <li>The Hackers Unity name and logo are protected brand assets.</li>
+    <li>Unauthorized use, imitation, modification, or redistribution is prohibited.</li>
+    <li>Use of the logo without written permission may result in legal action.</li>
+  </ul>
+
+  <div align="center">
+    <img
+      src="https://i.postimg.cc/3rb36xyW/Hacker-s-Unity-Logo.png"
+      alt="Hackers Unity Protected Logo"
+      width="140"
+    />
+    <p>
+      <em>
+        Official Hackers Unity Logo — Protected Intellectual Property
+      </em>
+    </p>
+  </div>
+
+  <p>
+    Violations may result in takedown requests, account suspension, and legal
+    proceedings under applicable copyright and trademark laws.
   </p>
 </section>
 
 <hr />
 
 <section>
-  <h2>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 1118 0z"></path>
-      <circle cx="12" cy="10" r="3"></circle>
-    </svg>
-    Contact & Community
-  </h2>
+  <h2>Community & Contact</h2>
 
   <p>
     <strong>Hackers Unity</strong><br />
