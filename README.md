@@ -176,24 +176,6 @@ simple-tic-tac-toe-main/
     <li>Derivatives, forks, or reuploads are not permitted.</li>
   </ul>
 
-  <h3>Logo & Brand Protection</h3>
-  <ul>
-    <li>The Hackers Unity name and logo are protected brand assets.</li>
-    <li>Unauthorized use, imitation, modification, or redistribution is prohibited.</li>
-    <li>Use of the logo without written permission may result in legal action.</li>
-  </ul>
-
-  <div align="center">
-    <img
-      src="https://i.postimg.cc/3rb36xyW/Hacker-s-Unity-Logo.png"
-      alt="Hackers Unity Protected Logo"
-      width="140"
-    />
-    <p>
-      <em>
-        Official Hackers Unity Logo — Protected Intellectual Property
-      </em>
-    </p>
   </div>
 
   <p>
