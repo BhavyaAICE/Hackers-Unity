@@ -6,7 +6,7 @@
 <div align="center">
   <!-- Official Hackers Unity Logo -->
   <img
-    src="[https://i.postimg.cc/3rb36xyW/Hacker-s-Unity-Logo.png](https://github.com/BhavyaAICE/Hackers-Unity/blob/main/src/assets/hackers-unity-logo.png)"
+    src="https://github.com/BhavyaAICE/Hackers-Unity/blob/main/src/assets/hackers-unity-logo.png"
     alt="Hackers Unity Official Logo"
     width="160"
   />
