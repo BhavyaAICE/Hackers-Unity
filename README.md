@@ -1,73 +1,204 @@
-# Welcome to your Lovable project
+<!--
+  Hackers Unity – Official Website
+  Proprietary Repository
+-->
 
-## Project info
+<div align="center">
+  <!-- Official Hackers Unity Logo -->
+  <img
+    src="https://github.com/BhavyaAICE/Hackers-Unity/blob/main/src/assets/hackers-unity-logo.png"
+    alt="Hackers Unity Official Logo"
+    width="160"
+  />
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+  <h1>Hackers Unity – Official Website</h1>
 
-## How can I edit this code?
+  <p>
+    The official digital platform of <strong>Hackers Unity</strong>, designed to
+    power hackathons, workshops, and community-driven technology initiatives.
+  </p>
 
-There are several ways of editing your application.
+  <p>
+    <em>
+      This repository is proprietary. Unauthorized use, copying, or distribution
+      is strictly prohibited.
+    </em>
+  </p>
+</div>
 
-**Use Lovable**
+<hr />
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+<section>
+  <h2>About Hackers Unity</h2>
 
-Changes made via Lovable will be committed automatically to this repo.
+  <p>
+    <strong>Hackers Unity</strong> is a student-led technology community in India
+    focused on empowering developers, innovators, and technology enthusiasts
+    through real-world exposure, collaboration, and skill-driven learning.
+  </p>
 
-**Use your preferred IDE**
+  <p>
+    Hackers Unity organizes hackathons, workshops, webinars, and technical events,
+    connecting students with practical opportunities and industry-level
+    experiences.
+  </p>
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+  <p>
+    This website serves as the <strong>official and exclusive digital platform</strong>
+    for managing community events, participant registrations, communications,
+    and administrative operations.
+  </p>
+</section>
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+<hr />
 
-Follow these steps:
+<section>
+  <h2>Platform Capabilities</h2>
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+  <h3>User Experience</h3>
+  <ul>
+    <li>Secure authentication and onboarding</li>
+    <li>Event and hackathon registration workflows</li>
+    <li>Automated confirmation emails</li>
+    <li>Responsive, accessible, and modern UI</li>
+    <li>SEO-optimized structure</li>
+  </ul>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+  <h3>Administrative Capabilities</h3>
+  <ul>
+    <li>Role-based admin access control</li>
+    <li>User profile and registration tracking</li>
+    <li>Event analytics and participation insights</li>
+    <li>Automated counters and validation using database triggers</li>
+  </ul>
 
-# Step 3: Install the necessary dependencies.
-npm i
+  <h3>Communication System</h3>
+  <ul>
+    <li>Transactional email delivery using Resend</li>
+    <li>Registration confirmation workflows</li>
+    <li>Scalable architecture for future announcements</li>
+  </ul>
+</section>
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+<hr />
 
-**Edit a file directly in GitHub**
+<section>
+  <h2>Technology Stack</h2>
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+  <h3>Frontend</h3>
+  <ul>
+    <li>Vite</li>
+    <li>TypeScript</li>
+    <li>Tailwind CSS</li>
+  </ul>
 
-**Use GitHub Codespaces**
+  <h3>Backend & Database</h3>
+  <ul>
+    <li>Supabase Authentication</li>
+    <li>PostgreSQL Database</li>
+    <li>SQL migrations, triggers, and functions</li>
+  </ul>
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+  <h3>Development Tooling</h3>
+  <ul>
+    <li>ESLint</li>
+    <li>PostCSS</li>
+    <li>npm / Bun support</li>
+  </ul>
+</section>
 
-## What technologies are used for this project?
+<hr />
 
-This project is built with:
+<section>
+  <h2>Project Structure</h2>
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+  <pre>
+simple-tic-tac-toe-main/
+├── index.html
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── lib/
+│   └── index.ts
+│
+├── migrations/
+│   ├── create_user_profiles.sql
+│   ├── create_complete_admin_system.sql
+│   ├── add_registration_count_trigger.sql
+│   └── additional SQL files
+│
+├── ADMIN_SETUP.md
+├── RESEND_SETUP_GUIDE.md
+├── README.md
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
+  </pre>
+</section>
 
-## How can I deploy this project?
+<hr />
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+<section>
+  <h2>Deployment Readiness</h2>
 
-## Can I connect a custom domain to my Lovable project?
+  <p>
+    This platform is production-ready and designed for deployment on modern
+    hosting environments such as Vercel, Netlify, or cloud-based VPS
+    infrastructures that support Node.js.
+  </p>
 
-Yes, you can!
+  <p>
+    The system emphasizes scalability, security, maintainability, and long-term
+    growth.
+  </p>
+</section>
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+<hr />
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+<section>
+  <h2>Intellectual Property & Usage Restrictions</h2>
+
+  <p>
+    © <strong>Hackers Unity</strong>. All rights reserved.
+  </p>
+
+  <p>
+    This repository, including but not limited to its source code, UI design,
+    database schema, documentation, workflows, branding assets, and logo, is the
+    <strong>exclusive intellectual property of Hackers Unity</strong>.
+  </p>
+
+  <h3>Code Usage Policy</h3>
+  <ul>
+    <li>This project is <strong>NOT open-source</strong>.</li>
+    <li>No license is granted to copy, modify, distribute, or reuse this code.</li>
+    <li>Use of this code for personal, educational, or commercial purposes is prohibited.</li>
+    <li>Derivatives, forks, or reuploads are not permitted.</li>
+  </ul>
+
+  </div>
+
+  <p>
+    Violations may result in takedown requests, account suspension, and legal
+    proceedings under applicable copyright and trademark laws.
+  </p>
+</section>
+
+<hr />
+
+<section>
+  <h2>Community & Contact</h2>
+
+  <p>
+    <strong>Hackers Unity</strong><br />
+    Official Technology Community Platform<br />
+    LinkedIn:
+    <a
+      href="https://www.linkedin.com/company/hackerunity/posts/?feedView=all"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      https://www.linkedin.com/company/hackerunity
+    </a>
+  </p>
+</section>
