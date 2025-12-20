@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
     console.log("API Key found, proceeding with email send");
 
     const emailBody = {
-      from: "bhavyagupta294@gmail.com",
+      from: "Hackers Unity <onboarding@resend.dev>",
       to: [to],
       subject: `Registration Confirmed - ${eventTitle}`,
       html: `
