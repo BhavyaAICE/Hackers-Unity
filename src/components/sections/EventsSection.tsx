@@ -69,10 +69,12 @@ const EventsSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Button variant="outline" size="lg">
-              View All Events
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Link to="/all-events">
+              <Button variant="outline" size="lg">
+                View All Events
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </motion.div>
         </div>
 

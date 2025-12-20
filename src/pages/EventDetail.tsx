@@ -181,7 +181,7 @@ const EventDetail = () => {
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${event.banner_image})` }}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/80 to-primary/90" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
           </>
         )}
         {!event.banner_image && (

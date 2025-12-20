@@ -95,7 +95,7 @@ export function OptimizedImage({
   return (
     <div
       className={cn(
-        "relative overflow-hidden",
+        "relative overflow-hidden w-full h-full",
         containerClassName
       )}
       style={{
@@ -130,18 +130,13 @@ export function OptimizedImage({
         srcSet={srcSet}
         sizes={sizesAttr}
         className={cn(
-          "transition-opacity duration-300",
+          "block w-full h-full transition-opacity duration-300",
           objectFitClass,
           isLoaded ? "opacity-100" : "opacity-0",
           className
         )}
         onLoad={handleLoad}
         onError={handleError}
-        style={{
-          // Prevent layout shift
-          width: width ? `${width}px` : '100%',
-          height: height ? `${height}px` : 'auto',
-        }}
       />
     </div>
   );

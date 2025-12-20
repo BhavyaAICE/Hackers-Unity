@@ -39,6 +39,7 @@ const EventForm = () => {
   const [loading, setLoading] = useState(false);
   const [useSameAsThumbnail, setUseSameAsThumbnail] = useState(true);
   const [bannerAltText, setBannerAltText] = useState("");
+  const [thumbnailAltText, setThumbnailAltText] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -478,19 +479,64 @@ const EventForm = () => {
             </div>
 
             <div className="space-y-4 mt-6">
+              <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-muted/30 p-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Use banner as thumbnail</p>
+                  <p className="text-xs text-muted-foreground">
+                    When enabled, uploading a banner will also generate the event thumbnail.
+                  </p>
+                </div>
+                <Switch
+                  checked={useSameAsThumbnail}
+                  onCheckedChange={(checked) => {
+                    setUseSameAsThumbnail(checked);
+                    if (checked && formData.banner_image) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        thumbnail_image: prev.banner_image,
+                      }));
+                    }
+                  }}
+                />
+              </div>
+
+              <ImageUpload
+                label="Thumbnail Image"
+                value={formData.thumbnail_image}
+                onChange={(url) => setFormData({ ...formData, thumbnail_image: url })}
+                altText={thumbnailAltText || `Thumbnail for ${formData.title}`}
+                onAltTextChange={setThumbnailAltText}
+                filenamePrefix={`event-${formData.title.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}-thumb`}
+                aspectRatio="square"
+                disabled={useSameAsThumbnail && !!formData.banner_image}
+                description="Used on event cards and listings."
+              />
+            </div>
+
+            <div className="space-y-4 mt-6">
               <ImageUpload
                 label="Banner Image"
                 value={formData.banner_image}
-                onChange={(url) => setFormData({ ...formData, banner_image: url })}
+                onChange={(url, imageData) => {
+                  setFormData((prev) => {
+                    const next = { ...prev, banner_image: url };
+
+                    if (useSameAsThumbnail) {
+                      const thumbUrl = url
+                        ? imageData?.variants.thumbnail?.url ||
+                          imageData?.variants.mobile?.url ||
+                          url
+                        : "";
+                      next.thumbnail_image = thumbUrl;
+                    }
+
+                    return next;
+                  });
+                }}
                 altText={bannerAltText || formData.title}
                 onAltTextChange={setBannerAltText}
                 filenamePrefix={`event-${formData.title.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}`}
                 aspectRatio="banner"
-                showThumbnailOption
-                thumbnailValue={formData.thumbnail_image}
-                onThumbnailChange={(url) => setFormData({ ...formData, thumbnail_image: url })}
-                useSameAsThumbnail={useSameAsThumbnail}
-                onUseSameAsThumbnailChange={setUseSameAsThumbnail}
                 description="Upload a high-quality banner image. It will be automatically optimized for web."
               />
             </div>

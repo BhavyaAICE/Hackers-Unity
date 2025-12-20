@@ -171,10 +171,16 @@ const SponsorsSection = () => {
           <p className="text-muted-foreground mb-6">
             Partner with Hacker's Unity and connect with 10,000+ passionate developers, students, and tech enthusiasts across India. Gain brand visibility and support the future of tech innovation.
           </p>
-          <Button variant="hero" size="lg" className="group">
-            Be Our Sponsor
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSdS8optJDKRZMdMpOwkH_QrKQUKLSGwEWW7YzQaB7wx2YrIXQ/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="hero" size="lg" className="group">
+              Be Our Sponsor
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </a>
         </motion.div>
       </div>
     </section>

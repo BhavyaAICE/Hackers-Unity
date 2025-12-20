@@ -207,15 +207,14 @@ const HeroSection = () => {
                           ? 'w-[100px] sm:w-32 md:w-40 lg:w-44 xl:w-48 aspect-[3/4]' 
                           : 'w-[100px] sm:w-36 md:w-44 lg:w-52 xl:w-56 aspect-[3/4]'
                         } 
-                        rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl bg-muted
+                        rounded-xl sm:rounded-2xl overflow-hidden hero-image-frame
                       `}>
                         <OptimizedImage 
                           src={image.url}
                           alt={image.alt}
                           width={isLast ? 192 : 224}
                           height={isLast ? 256 : 299}
-                          className="w-full h-full"
-                          objectFit="cover"
+                          className="w-full h-full object-cover object-top"
                           priority={true}
                           type="hero"
                         />

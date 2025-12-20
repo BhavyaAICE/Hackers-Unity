@@ -123,7 +123,7 @@ const HackathonsSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Link to="/hackathons">
+            <Link to="/all-hackathons">
               <Button variant="outline" size="lg">
                 Discover All Hackathons
                 <ArrowRight className="w-4 h-4" />
@@ -147,7 +147,7 @@ const HackathonsSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <Card variant="neon" className="overflow-hidden group h-full flex flex-col">
+                <Card variant="elevated" className="overflow-hidden group h-full flex flex-col">
                   {/* Image */}
                   <div className="relative h-40 overflow-hidden">
                     {imageUrl ? (

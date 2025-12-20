@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Upload, X, Image as ImageIcon, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,11 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [localAltText, setLocalAltText] = useState(altText);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync localAltText with altText prop when it changes
+  useEffect(() => {
+    setLocalAltText(altText);
+  }, [altText]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

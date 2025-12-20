@@ -136,10 +136,16 @@ const AchievementsSection = () => {
             <p className="text-muted-foreground mb-6">
               Join India's fastest-growing tech community and unlock endless opportunities
             </p>
-            <Button variant="hero" size="lg" className="group">
-              Join Our Community
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <a
+              href="https://discord.gg/vQRfwd8y6w"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="hero" size="lg" className="group">
+                Join Our Community
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </a>
           </div>
         </motion.div>
       </div>
