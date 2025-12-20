@@ -317,13 +317,13 @@ const EventRegister = () => {
                 <Input
                   id="email"
                   type="email"
+                  placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
-                  disabled
-                  className="bg-muted cursor-not-allowed"
+                  className="bg-muted/50"
                 />
               </div>
 
