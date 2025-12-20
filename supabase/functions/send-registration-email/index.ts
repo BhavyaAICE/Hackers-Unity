@@ -62,42 +62,129 @@ Deno.serve(async (req: Request) => {
       to: [to],
       subject: `Registration Confirmed - ${eventTitle}`,
       html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #00D9FF 0%, #A855F7 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .header h1 { color: white; margin: 0; font-size: 24px; }
-              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-              .message { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-              .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Registration Confirmed!</h1>
-              </div>
-              <div class="content">
-                <div class="message">
-                  <p>Dear ${userName},</p>
-                  <p>Thank you for registering for <strong>${eventType} - ${eventTitle}</strong>.</p>
-                  <p>We will send the session details soon!</p>
-                  <p style="margin-top: 30px;">Regards,<br><strong>Team Hacker's Unity</strong></p>
-                </div>
-              </div>
-              <div class="footer">
-                <p>&copy; 2025 Hacker's Unity. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `,
-      text: `Dear ${userName},\n\nThank you for registering for ${eventType} - ${eventTitle}.\n\nWe will send the session details soon!\n\nRegards,\nTeam Hacker's Unity`,
-    };
+       <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registration Confirmed – Hacker’s Unity</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        color: #ffffff;
+      }
+
+      .container {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .card {
+        background-color: #0a0a0a;
+        border-radius: 14px;
+        padding: 40px 32px;
+        border: 1px solid #1f1f1f;
+        text-align: center;
+      }
+
+      .logo img {
+        width: 120px;
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #cfcfcf;
+        margin-bottom: 22px;
+      }
+
+      .highlight {
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #ffffff;
+        color: #000000 !important;
+        text-decoration: none;
+        padding: 14px 34px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        margin-top: 10px;
+      }
+
+      .divider {
+        height: 1px;
+        background-color: #1f1f1f;
+        margin: 30px 0;
+      }
+
+      .footer {
+        font-size: 13px;
+        color: #9a9a9a;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="card">
+
+        <div class="logo">
+          <img
+            src="https://raw.githubusercontent.com/BhavyaAICE/Hackers-Unity/main/src/assets/hackers-unity-logo.png"
+            alt="Hacker’s Unity Logo"
+          />
+        </div>
+
+        <h1>You're Registered 🎉</h1>
+
+        <p>Hi <span class="highlight">{{userName}}</span>,</p>
+
+        <p>
+          You have successfully registered for the
+          <span class="highlight">{{eventType}} – {{eventTitle}}</span>.
+        </p>
+
+        <p>
+          We’ll be sharing important updates, schedules, and joining details
+          with you soon. Stay tuned!
+        </p>
+
+        <a href="{{eventUrl}}" class="button">
+          View Event Details
+        </a>
+
+        <div class="divider"></div>
+
+        <p>
+          If you didn’t register for this event, you can safely ignore this email.
+        </p>
+
+        <div class="footer">
+          © {{year}} Hacker’s Unity<br />
+          Building India’s next generation of technologists
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>
+
 
     console.log("Sending email with body:", emailBody);
 
