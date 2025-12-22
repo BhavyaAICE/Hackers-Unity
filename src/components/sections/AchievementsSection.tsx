@@ -137,7 +137,7 @@ const AchievementsSection = () => {
               Join India's fastest-growing tech community and unlock endless opportunities
             </p>
             <a
-              href="https://discord.gg/vQRfwd8y6w"
+              href="https://discord.gg/2ArqYfykBd"
               target="_blank"
               rel="noopener noreferrer"
             >
