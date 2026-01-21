@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, Navigate } from "react-router-dom";
 import { useAdmin } from "@/hooks/useAdmin";
+import { usePermissions, UserPermissions } from "@/hooks/usePermissions";
 import {
   LayoutDashboard,
   Calendar,
@@ -12,31 +13,46 @@ import {
   Menu,
   X,
   Trophy,
-  Inbox
+  Inbox,
+  Shield,
+  Megaphone,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/hackers-unity-logo.png";
 
 interface AdminLayoutProps {
   children: ReactNode;
+  requiredPermission?: keyof UserPermissions;
 }
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: Trophy, label: "Hackathons", href: "/admin/hackathons" },
-  { icon: Calendar, label: "Events", href: "/admin/events" },
-  { icon: Users, label: "Registrations", href: "/admin/registrations" },
-  { icon: Inbox, label: "Contact Queries", href: "/admin/contact-queries" },
-  { icon: Award, label: "Achievements", href: "/admin/achievements" },
-  { icon: FileText, label: "Content", href: "/admin/content" },
-  { icon: Award, label: "Sponsors", href: "/admin/sponsors" },
-  { icon: MessageSquare, label: "Testimonials", href: "/admin/testimonials" },
+interface NavItem {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
+  permission?: keyof UserPermissions;
+}
+
+const navItems: NavItem[] = [
+  { icon: LayoutDashboard, label: "Dashboard", href: "/admin", permission: "can_view_dashboard" },
+  { icon: Trophy, label: "Hackathons", href: "/admin/hackathons", permission: "can_manage_hackathons" },
+  { icon: Calendar, label: "Events", href: "/admin/events", permission: "can_manage_events" },
+  { icon: Users, label: "Registrations", href: "/admin/registrations", permission: "can_view_registrations" },
+  { icon: Inbox, label: "Contact Queries", href: "/admin/contact-queries", permission: "can_view_contact_queries" },
+  { icon: Award, label: "Achievements", href: "/admin/achievements", permission: "can_manage_achievements" },
+  { icon: FileText, label: "Content", href: "/admin/content", permission: "can_manage_content" },
+  { icon: Megaphone, label: "Sponsors", href: "/admin/sponsors", permission: "can_manage_sponsors" },
+  { icon: MessageSquare, label: "Testimonials", href: "/admin/testimonials", permission: "can_manage_testimonials" },
+  { icon: Shield, label: "User Management", href: "/admin/users", permission: "can_manage_users" },
 ];
 
-const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const { isAdmin, loading } = useAdmin();
+const AdminLayout = ({ children, requiredPermission }: AdminLayoutProps) => {
+  const { isAdmin, loading: adminLoading } = useAdmin();
+  const { permissions, loading: permissionsLoading, hasAnyPermission, hasPermission } = usePermissions();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const loading = adminLoading || permissionsLoading;
 
   if (loading) {
     return (
@@ -46,9 +62,36 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     );
   }
 
-  if (!isAdmin) {
+  // Check if user has any admin access (super admin or any permission)
+  const hasAccess = isAdmin || hasAnyPermission();
+  
+  if (!hasAccess) {
     return <Navigate to="/" replace />;
   }
+
+  // Check specific permission if required
+  if (requiredPermission && !hasPermission(requiredPermission)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center p-8">
+          <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+          <p className="text-muted-foreground mb-4">
+            You don't have permission to access this page.
+          </p>
+          <Link to="/admin">
+            <Button>Return to Dashboard</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter nav items based on permissions
+  const visibleNavItems = navItems.filter((item) => {
+    if (!item.permission) return true;
+    return hasPermission(item.permission);
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,7 +125,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           </div>
 
           <nav className="px-4 space-y-2 pb-4">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link

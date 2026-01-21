@@ -104,7 +104,7 @@ const ContactQueries = () => {
   const doneQueries = queries?.filter((q) => q.status === "done") || [];
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_view_contact_queries">
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold font-display">Contact Queries</h1>

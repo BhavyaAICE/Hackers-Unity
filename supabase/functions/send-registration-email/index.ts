@@ -1,4 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,16 +57,14 @@ Deno.serve(async (req: Request) => {
 
     console.log("API Key found, proceeding with email send");
 
-    const emailBody = {
-      from: "Hackers Unity <onboarding@resend.dev>",
-      to: [to],
-      subject: `Registration Confirmed - ${eventTitle}`,
-      html: `
-       <!DOCTYPE html>
+    const currentYear = new Date().getFullYear();
+    const eventUrl = "https://hackersunity.org";
+
+    const htmlContent = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Registration Confirmed – Hacker’s Unity</title>
+    <title>Registration Confirmed – Hacker's Unity</title>
     <style>
       body {
         margin: 0;
@@ -147,51 +145,57 @@ Deno.serve(async (req: Request) => {
         <div class="logo">
           <img
             src="https://raw.githubusercontent.com/BhavyaAICE/Hackers-Unity/main/src/assets/hackers-unity-logo.png"
-            alt="Hacker’s Unity Logo"
+            alt="Hacker's Unity Logo"
           />
         </div>
 
         <h1>You're Registered 🎉</h1>
 
-        <p>Hi <span class="highlight">{{userName}}</span>,</p>
+        <p>Hi <span class="highlight">${userName}</span>,</p>
 
         <p>
           You have successfully registered for the
-          <span class="highlight">{{eventType}} – {{eventTitle}}</span>.
+          <span class="highlight">${eventType} – ${eventTitle}</span>.
         </p>
 
         <p>
-          We’ll be sharing important updates, schedules, and joining details
+          We'll be sharing important updates, schedules, and joining details
           with you soon. Stay tuned!
         </p>
 
-        <a href="{{eventUrl}}" class="button">
+        <a href="${eventUrl}" class="button">
           View Event Details
         </a>
 
         <div class="divider"></div>
 
         <p>
-          If you didn’t register for this event, you can safely ignore this email.
+          If you didn't register for this event, you can safely ignore this email.
         </p>
 
         <div class="footer">
-          © {{year}} Hacker’s Unity<br />
-          Building India’s next generation of technologists
+          © ${currentYear} Hacker's Unity<br />
+          Building India's next generation of technologists
         </div>
 
       </div>
     </div>
   </body>
-</html>
+</html>`;
 
+    const emailBody = {
+      from: "Hackers Unity <onboarding@resend.dev>",
+      to: [to],
+      subject: `Registration Confirmed - ${eventTitle}`,
+      html: htmlContent,
+    };
 
     console.log("Sending email with body:", emailBody);
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${resendApiKey}`,
+        "Authorization": "Bearer " + resendApiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(emailBody),

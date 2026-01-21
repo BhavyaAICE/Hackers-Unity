@@ -145,14 +145,14 @@ const Sponsors = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
+      <AdminLayout requiredPermission="can_manage_sponsors">
         <div>Loading...</div>
       </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_manage_sponsors">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>

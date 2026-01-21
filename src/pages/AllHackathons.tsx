@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Trophy, Clock, Users, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Trophy, Clock, Users, ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,7 @@ interface Hackathon {
   banner_image: string | null;
   status: string | null;
   registration_enabled: boolean;
+  external_link: string | null;
 }
 
 const AllHackathons = () => {
@@ -38,7 +39,7 @@ const AllHackathons = () => {
       .from("events")
       .select("*")
       .eq("event_type", "hackathon")
-      .order("event_date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (!error && data) {
       setHackathons(data);
@@ -126,17 +127,17 @@ const AllHackathons = () => {
                   >
                     <Card variant="elevated" className="overflow-hidden group h-full flex flex-col">
                       {/* Image */}
-                      <div className="relative h-48 overflow-hidden">
+                      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
                         {imageUrl ? (
                           <img
                             src={imageUrl}
                             alt={hackathon.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
 
                         {/* Countdown Badge */}
                         {daysLeft && status === "registering" && (
@@ -148,7 +149,7 @@ const AllHackathons = () => {
 
                         {/* Status Badge */}
                         <div
-                          className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${
+                          className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold ${
                             status === "registering"
                               ? "bg-primary text-primary-foreground"
                               : status === "completed"
@@ -163,7 +164,7 @@ const AllHackathons = () => {
                             : status === "registration-closed"
                             ? "Closed"
                             : status === "registering"
-                            ? "Open"
+                            ? "Upcoming"
                             : "Coming Soon"}
                         </div>
                       </div>
@@ -202,20 +203,47 @@ const AllHackathons = () => {
                           </div>
                         </div>
 
-                        <Link to={`/hackathon/${hackathon.id}`}>
-                          <Button
-                            variant={canRegister ? "hero" : "outline"}
-                            className="w-full mt-6"
-                          >
-                            {status === "completed"
-                              ? "View Details"
-                              : status === "registration-closed"
-                              ? "View Details"
-                              : canRegister
-                              ? "Register Now"
-                              : "Notify Me"}
-                          </Button>
-                        </Link>
+                        {/* Button with external link support */}
+                        <div className="mt-6">
+                          {hackathon.external_link ? (
+                            status === "completed" ? (
+                              <a href={hackathon.external_link} target="_blank" rel="noopener noreferrer" className="block">
+                                <Button variant="outline" className="w-full">
+                                  View Details
+                                  <ArrowUpRight className="w-4 h-4 ml-1" />
+                                </Button>
+                              </a>
+                            ) : canRegister ? (
+                              <a href={hackathon.external_link} target="_blank" rel="noopener noreferrer" className="block">
+                                <Button variant="hero" className="w-full">
+                                  Register Now
+                                  <ArrowUpRight className="w-4 h-4 ml-1" />
+                                </Button>
+                              </a>
+                            ) : (
+                              <Link to={`/hackathon/${hackathon.id}`}>
+                                <Button variant="outline" className="w-full">
+                                  View Details
+                                </Button>
+                              </Link>
+                            )
+                          ) : (
+                            <Link to={`/hackathon/${hackathon.id}`}>
+                              <Button
+                                variant={canRegister ? "hero" : "outline"}
+                                className="w-full"
+                              >
+                                {status === "completed"
+                                  ? "View Details"
+                                  : status === "registration-closed"
+                                  ? "View Details"
+                                  : canRegister
+                                  ? "Register Now"
+                                  : "Notify Me"}
+                              </Button>
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </Card>
                   </motion.div>

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUpload } from "@/components/ui/image-upload";
+import AdminLayout from "@/components/admin/AdminLayout";
 interface Testimonial {
   id: string;
   name: string;
@@ -172,14 +173,17 @@ const Testimonials = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-muted-foreground">Loading testimonials...</div>
-      </div>
+      <AdminLayout requiredPermission="can_manage_testimonials">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-muted-foreground">Loading testimonials...</div>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <AdminLayout requiredPermission="can_manage_testimonials">
+      <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Testimonials Management</h1>
         <Button onClick={handleAddTestimonial} className="gap-2">
@@ -351,7 +355,8 @@ const Testimonials = () => {
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 

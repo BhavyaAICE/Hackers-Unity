@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Upload, X, Image as ImageIcon, Loader2, AlertCircle } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Loader2, AlertCircle, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ interface ImageUploadProps {
   filenamePrefix?: string;
   className?: string;
   aspectRatio?: "square" | "video" | "banner" | "auto";
+  allowUrlInput?: boolean;
 }
 
 const aspectRatioClasses = {
@@ -54,12 +55,15 @@ export function ImageUpload({
   filenamePrefix,
   className,
   aspectRatio = "video",
+  allowUrlInput = true,
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [localAltText, setLocalAltText] = useState(altText);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInputValue, setUrlInputValue] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync localAltText with altText prop when it changes
@@ -176,6 +180,8 @@ export function ImageUpload({
     if (onThumbnailChange) {
       onThumbnailChange("");
     }
+    setShowUrlInput(false);
+    setUrlInputValue("");
   };
 
   const handleAltTextChange = (newAlt: string) => {
@@ -184,6 +190,27 @@ export function ImageUpload({
     if (error === "Please provide alt text for accessibility before uploading") {
       setError(null);
     }
+  };
+
+  const handleUrlSubmit = () => {
+    if (!urlInputValue.trim()) {
+      setError("Please enter a valid URL");
+      return;
+    }
+    
+    // Basic URL validation
+    try {
+      new URL(urlInputValue);
+    } catch {
+      setError("Please enter a valid URL");
+      return;
+    }
+
+    onChange(urlInputValue);
+    setShowUrlInput(false);
+    setUrlInputValue("");
+    setError(null);
+    toast.success("Image URL added successfully");
   };
 
   return (
@@ -213,105 +240,144 @@ export function ImageUpload({
         />
       </div>
 
-      {/* Upload area */}
-      <div
-        className={cn(
-          "relative border-2 border-dashed rounded-lg transition-all duration-200",
-          aspectRatioClasses[aspectRatio],
-          isDragging
-            ? "border-primary bg-primary/5"
-            : "border-border hover:border-primary/50",
-          disabled && "opacity-50 cursor-not-allowed",
-          !value && "min-h-[200px]"
-        )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {value ? (
-          <div className="relative w-full h-full">
-            <img
-              src={value}
-              alt={localAltText || "Uploaded image"}
-              className="w-full h-full object-cover rounded-lg"
-              onError={(e) => {
-                e.currentTarget.src = "";
-                e.currentTarget.alt = "Failed to load image";
-              }}
+      {/* URL Input Mode */}
+      {showUrlInput && (
+        <div className="space-y-2 p-4 bg-muted/50 rounded-lg border border-border">
+          <Label className="text-sm">Image URL</Label>
+          <div className="flex gap-2">
+            <Input
+              value={urlInputValue}
+              onChange={(e) => setUrlInputValue(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              disabled={disabled}
             />
-            {!disabled && !isUploading && (
-              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Replace
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleRemove}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
+            <Button type="button" onClick={handleUrlSubmit} disabled={disabled}>
+              Add
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setShowUrlInput(false)}>
+              Cancel
+            </Button>
           </div>
-        ) : (
-          <div
-            className={cn(
-              "absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer",
-              (disabled || isUploading) && "cursor-not-allowed"
-            )}
-            onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
-          >
-            {isUploading ? (
-              <>
-                <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                <div className="w-48 space-y-2">
-                  <Progress value={uploadProgress} className="h-2" />
-                  <p className="text-sm text-muted-foreground text-center">
-                    Optimizing... {uploadProgress}%
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="p-4 rounded-full bg-muted">
-                  {isDragging ? (
-                    <ImageIcon className="w-8 h-8 text-primary" />
-                  ) : (
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium">
-                    {isDragging ? "Drop image here" : "Click or drag image to upload"}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    JPEG, PNG, GIF, WebP • Max 50MB
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Will be converted to WebP & optimized
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        )}
+        </div>
+      )}
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={disabled || isUploading}
-        />
-      </div>
+      {/* Upload area */}
+      {!showUrlInput && (
+        <div
+          className={cn(
+            "relative border-2 border-dashed rounded-lg transition-all duration-200",
+            aspectRatioClasses[aspectRatio],
+            isDragging
+              ? "border-primary bg-primary/5"
+              : "border-border hover:border-primary/50",
+            disabled && "opacity-50 cursor-not-allowed",
+            !value && "min-h-[200px]"
+          )}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {value ? (
+            <div className="relative w-full h-full">
+              <img
+                src={value}
+                alt={localAltText || "Uploaded image"}
+                className="w-full h-full object-contain rounded-lg bg-muted"
+                onError={(e) => {
+                  e.currentTarget.src = "";
+                  e.currentTarget.alt = "Failed to load image";
+                  setError("Failed to load image from URL");
+                }}
+              />
+              {!disabled && !isUploading && (
+                <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Replace
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemove}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              className={cn(
+                "absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer",
+                (disabled || isUploading) && "cursor-not-allowed"
+              )}
+              onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                  <div className="w-48 space-y-2">
+                    <Progress value={uploadProgress} className="h-2" />
+                    <p className="text-sm text-muted-foreground text-center">
+                      Optimizing... {uploadProgress}%
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="p-4 rounded-full bg-muted">
+                    {isDragging ? (
+                      <ImageIcon className="w-8 h-8 text-primary" />
+                    ) : (
+                      <Upload className="w-8 h-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium">
+                      {isDragging ? "Drop image here" : "Click or drag image to upload"}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      JPEG, PNG, GIF, WebP • Max 50MB
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Will be converted to WebP & optimized
+                    </p>
+                  </div>
+                  {allowUrlInput && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowUrlInput(true);
+                      }}
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      Or paste URL
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={disabled || isUploading}
+          />
+        </div>
+      )}
 
       {/* Error message */}
       {error && (

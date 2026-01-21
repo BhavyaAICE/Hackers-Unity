@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Trophy, Clock, ArrowRight, Users } from "lucide-react";
+import { Calendar, MapPin, Trophy, Users, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,50 +21,56 @@ interface Hackathon {
   banner_image: string | null;
   status: string | null;
   registration_enabled: boolean;
+  external_link: string | null;
 }
 
 const HackathonsSection = () => {
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchHackathons = async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("event_type", "hackathon")
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (!error && data) {
+        setHackathons(data);
+      }
+      setLoading(false);
+    };
+
     fetchHackathons();
   }, []);
 
-  const fetchHackathons = async () => {
-    const { data, error } = await supabase
-      .from("events")
-      .select("*")
-      .eq("event_type", "hackathon")
-      .order("event_date", { ascending: true })
-      .limit(4);
-
-    if (!error && data) {
-      setHackathons(data);
-    }
-    setLoading(false);
-  };
-
+  // Helper to determine hackathon status
   const getHackathonStatus = (hackathon: Hackathon) => {
     const now = new Date();
+    const eventEnd = hackathon.event_end_date ? new Date(hackathon.event_end_date) : null;
+    const registrationDeadline = hackathon.registration_deadline ? new Date(hackathon.registration_deadline) : null;
+    const eventStart = hackathon.event_date ? new Date(hackathon.event_date) : null;
     
-    // Check if event is completed
-    const eventEndDate = hackathon.event_end_date || hackathon.event_date;
-    if (eventEndDate && isPast(new Date(eventEndDate))) {
+    if (hackathon.status === 'completed' || (eventEnd && isPast(eventEnd))) {
       return { status: 'completed', label: 'Completed', canRegister: false };
     }
-
-    // Check if registration is closed
-    if (hackathon.registration_deadline && isPast(new Date(hackathon.registration_deadline))) {
-      return { status: 'registration-closed', label: 'Registration Closed', canRegister: false };
+    
+    if (registrationDeadline && isPast(registrationDeadline)) {
+      return { status: 'closed', label: 'Registration Closed', canRegister: false };
     }
-
-    // Registration is open
-    if (hackathon.registration_enabled) {
-      return { status: 'registering', label: 'Register Now', canRegister: true };
+    
+    if (hackathon.registration_enabled && registrationDeadline && !isPast(registrationDeadline)) {
+      return { status: 'registering', label: 'Upcoming', canRegister: true };
     }
-
-    return { status: 'coming-soon', label: 'Coming Soon', canRegister: false };
+    
+    if (eventStart && !isPast(eventStart)) {
+      return { status: 'coming_soon', label: 'Coming Soon', canRegister: false };
+    }
+    
+    return { status: 'unknown', label: 'TBA', canRegister: false };
   };
 
   const getDaysLeft = (deadline: string | null) => {
@@ -73,31 +79,33 @@ const HackathonsSection = () => {
     return days > 0 ? days : null;
   };
 
-  if (loading) {
-    return (
-      <section className="py-24 bg-muted/30" id="hackathons">
-        <div className="container-custom">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 w-64 bg-muted rounded" />
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-80 bg-muted rounded-xl" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (hackathons.length === 0) {
+  // Don't render the section if there are no hackathons
+  if (!loading && hackathons.length === 0) {
     return null;
   }
 
+  const handleCardClick = (hackathon: Hackathon, statusInfo: ReturnType<typeof getHackathonStatus>) => {
+    // For completed hackathons with external link, go to external site
+    if (statusInfo.status === 'completed' && hackathon.external_link) {
+      window.open(hackathon.external_link, '_blank');
+      return;
+    }
+    // Otherwise go to detail page
+    navigate(`/hackathon/${hackathon.id}`);
+  };
+
+  const handleRegisterClick = (e: React.MouseEvent, hackathon: Hackathon) => {
+    e.stopPropagation();
+    if (hackathon.external_link) {
+      window.open(hackathon.external_link, '_blank');
+    } else {
+      navigate(`/events/${hackathon.id}/register`);
+    }
+  };
+
   return (
-    <section className="py-24 bg-muted/30" id="hackathons">
+    <section className="py-24 bg-background" id="hackathons">
       <div className="container-custom">
-        {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <motion.span
@@ -106,7 +114,7 @@ const HackathonsSection = () => {
               viewport={{ once: true }}
               className="text-primary text-sm font-semibold uppercase tracking-wider"
             >
-              Our Hackathons
+              Hackathons
             </motion.span>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -115,7 +123,7 @@ const HackathonsSection = () => {
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl md:text-5xl font-bold font-display mt-4"
             >
-              Hackathons <span className="text-primary">Showcase</span>
+              Innovation <span className="text-primary">Showcase</span>
             </motion.h2>
           </div>
           <motion.div
@@ -125,121 +133,139 @@ const HackathonsSection = () => {
           >
             <Link to="/all-hackathons">
               <Button variant="outline" size="lg">
-                Discover All Hackathons
+                View All Hackathons
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </motion.div>
         </div>
 
-        {/* Hackathons Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {hackathons.map((hackathon, index) => {
-            const { status, label, canRegister } = getHackathonStatus(hackathon);
-            const daysLeft = getDaysLeft(hackathon.registration_deadline);
-            const imageUrl = hackathon.thumbnail_image || hackathon.banner_image;
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-muted rounded-xl aspect-[16/10]" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {hackathons.map((hackathon, index) => {
+              const statusInfo = getHackathonStatus(hackathon);
+              const daysLeft = getDaysLeft(hackathon.registration_deadline);
 
-            return (
-              <motion.div
-                key={hackathon.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <Card variant="elevated" className="overflow-hidden group h-full flex flex-col">
-                  {/* Image */}
-                  <div className="relative h-40 overflow-hidden">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={hackathon.title}
-                        width={400}
-                        height={160}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
-                    
-                    {/* Countdown Badge */}
-                    {daysLeft && status === 'registering' && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/90 backdrop-blur-sm">
-                        <Clock className="w-3.5 h-3.5 text-accent" />
-                        <span className="text-xs font-semibold text-accent">{daysLeft} days left</span>
-                      </div>
-                    )}
-
-                    {/* Status Badge */}
-                    <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${
-                      status === 'registering' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : status === 'completed'
-                        ? 'bg-green-500 text-white'
-                        : status === 'registration-closed'
-                        ? 'bg-destructive text-destructive-foreground'
-                        : 'bg-secondary text-secondary-foreground'
-                    }`}>
-                      {status === 'completed' ? 'Completed' : 
-                       status === 'registration-closed' ? 'Closed' :
-                       status === 'registering' ? 'Open' : 'Coming Soon'}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5 flex-1 flex flex-col">
-                    {hackathon.subtitle && (
-                      <p className="text-xs text-muted-foreground mb-1">{hackathon.subtitle}</p>
-                    )}
-                    <h3 className="font-display font-semibold text-lg mb-3 text-foreground group-hover:text-primary transition-colors">
-                      {hackathon.title}
-                    </h3>
-                    
-                    <div className="space-y-2 text-sm text-muted-foreground flex-1">
-                      {hackathon.event_date && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-primary" />
-                          {format(new Date(hackathon.event_date), "MMM d, yyyy")}
+              return (
+                <motion.div
+                  key={hackathon.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  onClick={() => handleCardClick(hackathon, statusInfo)}
+                  className="cursor-pointer"
+                >
+                  <Card variant="elevated" className="overflow-hidden group h-full flex flex-col">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                      {(hackathon.thumbnail_image || hackathon.banner_image) ? (
+                        <img
+                          src={hackathon.thumbnail_image || hackathon.banner_image || ''}
+                          alt={hackathon.title}
+                          width={400}
+                          height={250}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <Trophy className="w-12 h-12 text-primary/40" />
                         </div>
                       )}
-                      {hackathon.location_name && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-primary" />
-                          {hackathon.location_name}
-                        </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                      
+                      {/* Status badge */}
+                      <span className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${
+                        statusInfo.status === 'completed' 
+                          ? 'bg-muted text-muted-foreground' 
+                          : statusInfo.status === 'registering'
+                          ? 'bg-green-500/90 text-white'
+                          : statusInfo.status === 'closed'
+                          ? 'bg-red-500/90 text-white'
+                          : 'bg-primary/90 text-primary-foreground'
+                      }`}>
+                        {statusInfo.label}
+                      </span>
+
+                      {/* Days left badge */}
+                      {daysLeft && statusInfo.canRegister && (
+                        <span className="absolute top-4 right-4 px-2 py-1 rounded-full bg-orange-500/90 text-white text-xs font-semibold">
+                          {daysLeft}d left
+                        </span>
                       )}
-                      {hackathon.prize_pool && (
-                        <div className="flex items-center gap-2">
-                          <Trophy className="w-4 h-4 text-primary" />
-                          Prize Pool: {hackathon.prize_pool}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-primary" />
-                        {hackathon.registration_count}+ Participants
-                      </div>
                     </div>
 
-                    <Link to={`/hackathon/${hackathon.id}`}>
-                      <Button 
-                        variant={canRegister ? 'hero' : 'outline'} 
-                        size="sm" 
-                        className="w-full mt-4"
-                      >
-                        {status === 'completed' ? 'View Details' : 
-                         status === 'registration-closed' ? 'View Details' :
-                         canRegister ? 'Register Now' : 'Notify Me'}
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-display font-semibold text-lg mb-3 text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                        {hackathon.title}
+                      </h3>
+                      <div className="space-y-2 text-sm text-muted-foreground flex-1">
+                        {hackathon.event_date && (
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            {format(new Date(hackathon.event_date), "MMM dd, yyyy")}
+                          </div>
+                        )}
+                        {hackathon.location_name && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            {hackathon.location_name}
+                          </div>
+                        )}
+                        {hackathon.prize_pool && (
+                          <div className="flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-primary" />
+                            {hackathon.prize_pool}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-primary" />
+                          {hackathon.registration_count}+ Registered
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        {statusInfo.canRegister ? (
+                          <Button 
+                            variant="hero" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={(e) => handleRegisterClick(e, hackathon)}
+                          >
+                            Register Now
+                            {hackathon.external_link && <ArrowUpRight className="w-3.5 h-3.5 ml-1" />}
+                          </Button>
+                        ) : statusInfo.status === 'completed' ? (
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Details
+                            {hackathon.external_link && <ArrowUpRight className="w-3.5 h-3.5 ml-1" />}
+                          </Button>
+                        ) : (
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Details
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

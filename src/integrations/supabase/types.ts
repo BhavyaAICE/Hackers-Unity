@@ -53,6 +53,75 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_permissions: {
+        Row: {
+          can_export_data: boolean | null
+          can_manage_achievements: boolean | null
+          can_manage_content: boolean | null
+          can_manage_events: boolean | null
+          can_manage_hackathons: boolean | null
+          can_manage_sponsors: boolean | null
+          can_manage_testimonials: boolean | null
+          can_manage_users: boolean | null
+          can_view_contact_queries: boolean | null
+          can_view_dashboard: boolean | null
+          can_view_registrations: boolean | null
+          created_at: string | null
+          email: string
+          id: string
+          invite_accepted_at: string | null
+          invite_token: string | null
+          invited_by: string | null
+          is_active: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          can_export_data?: boolean | null
+          can_manage_achievements?: boolean | null
+          can_manage_content?: boolean | null
+          can_manage_events?: boolean | null
+          can_manage_hackathons?: boolean | null
+          can_manage_sponsors?: boolean | null
+          can_manage_testimonials?: boolean | null
+          can_manage_users?: boolean | null
+          can_view_contact_queries?: boolean | null
+          can_view_dashboard?: boolean | null
+          can_view_registrations?: boolean | null
+          created_at?: string | null
+          email: string
+          id?: string
+          invite_accepted_at?: string | null
+          invite_token?: string | null
+          invited_by?: string | null
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          can_export_data?: boolean | null
+          can_manage_achievements?: boolean | null
+          can_manage_content?: boolean | null
+          can_manage_events?: boolean | null
+          can_manage_hackathons?: boolean | null
+          can_manage_sponsors?: boolean | null
+          can_manage_testimonials?: boolean | null
+          can_manage_users?: boolean | null
+          can_view_contact_queries?: boolean | null
+          can_view_dashboard?: boolean | null
+          can_view_registrations?: boolean | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          invite_accepted_at?: string | null
+          invite_token?: string | null
+          invited_by?: string | null
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       contact_queries: {
         Row: {
           created_at: string
@@ -619,6 +688,7 @@ export type Database = {
           end_time: string | null
           event_id: string | null
           id: string
+          schedule_date: string | null
           speaker_id: string | null
           start_time: string | null
           title: string
@@ -631,6 +701,7 @@ export type Database = {
           end_time?: string | null
           event_id?: string | null
           id?: string
+          schedule_date?: string | null
           speaker_id?: string | null
           start_time?: string | null
           title: string
@@ -643,6 +714,7 @@ export type Database = {
           end_time?: string | null
           event_id?: string | null
           id?: string
+          schedule_date?: string | null
           speaker_id?: string | null
           start_time?: string | null
           title?: string
@@ -817,6 +889,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       website_content: {
         Row: {
           content: Json | null
@@ -858,13 +951,49 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_profiles_public: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_user_email: { Args: { _user_id: string }; Returns: string }
+      get_user_permissions: { Args: { _user_id: string }; Returns: Json }
+      has_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -991,6 +1120,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

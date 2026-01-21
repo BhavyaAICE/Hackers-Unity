@@ -69,14 +69,14 @@ const Events = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
+      <AdminLayout requiredPermission="can_manage_events">
         <div>Loading...</div>
       </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_manage_events">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>

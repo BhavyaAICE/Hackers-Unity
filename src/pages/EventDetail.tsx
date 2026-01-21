@@ -26,6 +26,7 @@ interface Event {
   registration_count: number;
   registration_enabled: boolean;
   benefits_text: string | null;
+  external_link: string | null;
 }
 
 interface Speaker {
@@ -177,11 +178,14 @@ const EventDetail = () => {
       <section className="relative pt-32 pb-20 overflow-hidden">
         {event.banner_image && (
           <>
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${event.banner_image})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+            <div className="absolute inset-0 bg-muted">
+              <img
+                src={event.banner_image}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" />
           </>
         )}
         {!event.banner_image && (
@@ -454,15 +458,31 @@ const EventDetail = () => {
 
                 <div className="mt-6">
                   {isEventCompleted ? (
-                    <Button variant="outline" size="lg" className="w-full" disabled>
-                      Event Completed
-                    </Button>
-                  ) : canRegister ? (
-                    <Link to={`/events/${event.id}/register`}>
-                      <Button variant="hero" size="lg" className="w-full">
-                        Register Now
+                    event.external_link ? (
+                      <a href={event.external_link} target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" size="lg" className="w-full">
+                          View on External Site
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button variant="outline" size="lg" className="w-full" disabled>
+                        Event Completed
                       </Button>
-                    </Link>
+                    )
+                  ) : canRegister ? (
+                    event.external_link ? (
+                      <a href={event.external_link} target="_blank" rel="noopener noreferrer">
+                        <Button variant="hero" size="lg" className="w-full">
+                          Register Now
+                        </Button>
+                      </a>
+                    ) : (
+                      <Link to={`/events/${event.id}/register`}>
+                        <Button variant="hero" size="lg" className="w-full">
+                          Register Now
+                        </Button>
+                      </Link>
+                    )
                   ) : isRegistrationClosed ? (
                     <Button variant="outline" size="lg" className="w-full" disabled>
                       Registration Closed

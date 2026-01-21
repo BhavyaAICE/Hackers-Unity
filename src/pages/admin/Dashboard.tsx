@@ -70,7 +70,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_view_dashboard">
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold font-display">Dashboard</h1>

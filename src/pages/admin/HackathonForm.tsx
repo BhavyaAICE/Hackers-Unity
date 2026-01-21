@@ -84,6 +84,7 @@ interface Winner {
 interface ScheduleItem {
   id?: string;
   day: number;
+  schedule_date: string;
   start_time: string;
   end_time: string;
   title: string;
@@ -131,6 +132,7 @@ const HackathonForm = () => {
     registration_enabled: true,
     prize_pool: "",
     max_participants: "",
+    external_link: "",
   });
 
   // Related data
@@ -181,6 +183,7 @@ const HackathonForm = () => {
         registration_enabled: data.registration_enabled ?? true,
         prize_pool: data.prize_pool || "",
         max_participants: data.max_participants?.toString() || "",
+        external_link: data.external_link || "",
       });
     }
 
@@ -190,7 +193,7 @@ const HackathonForm = () => {
     setPrizes(prizesRes.data || []);
     setFaqs(faqsRes.data || []);
     setWinners((winnersRes.data || []).map(w => ({ ...w, image_alt: `${w.team_name} project` })));
-    setSchedule(scheduleRes.data || []);
+    setSchedule((scheduleRes.data || []).map(s => ({ ...s, schedule_date: s.schedule_date || "" })));
     setLoading(false);
   };
 
@@ -256,8 +259,8 @@ const HackathonForm = () => {
     setWinners(updated);
   };
 
-  const addScheduleItem = () => setSchedule([...schedule, { day: 1, start_time: "", end_time: "", title: "", description: "" }]);
-  const removeScheduleItem = (i: number) => setSchedule(schedule.filter((_, idx) => idx !== i));
+  const addScheduleItem = () => setSchedule((prev) => [...prev, { day: 1, schedule_date: "", start_time: "", end_time: "", title: "", description: "" } as ScheduleItem]);
+  const removeScheduleItem = (i: number) => setSchedule((prev) => prev.filter((_, idx) => idx !== i));
   const updateScheduleItem = (i: number, field: keyof ScheduleItem, value: any) => {
     const updated = [...schedule];
     (updated[i] as any)[field] = value;
@@ -292,6 +295,7 @@ const HackathonForm = () => {
         registration_enabled: formData.registration_enabled,
         prize_pool: formData.prize_pool || null,
         max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
+        external_link: formData.external_link || null,
         created_by: user?.id,
       };
 
@@ -431,6 +435,7 @@ const HackathonForm = () => {
               schedule.filter(s => s.title).map((s, i) => ({
                 event_id: eventId,
                 day: s.day,
+                schedule_date: s.schedule_date || null,
                 start_time: s.start_time || null,
                 end_time: s.end_time || null,
                 title: s.title,
@@ -477,7 +482,7 @@ const HackathonForm = () => {
   );
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_manage_hackathons">
       <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -632,6 +637,31 @@ const HackathonForm = () => {
                     useSameAsThumbnail={useSameAsThumbnail}
                     onUseSameAsThumbnailChange={setUseSameAsThumbnail}
                   />
+                </div>
+
+                {/* External Registration Link */}
+                <div className="md:col-span-2 p-4 bg-muted/50 rounded-lg space-y-4">
+                  <div>
+                    <Label className="text-base font-semibold">External Registration</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      If registration is hosted on another platform (Devfolio, DoraHacks, etc.), add the link below. 
+                      Users will be redirected there for registration and event details.
+                    </p>
+                  </div>
+                  <div>
+                    <Label>External Link (Optional)</Label>
+                    <Input
+                      value={formData.external_link}
+                      onChange={(e) => setFormData({ ...formData, external_link: e.target.value })}
+                      placeholder="e.g., https://devfolio.co/hackathon-name or https://dorahacks.io/hackathon/..."
+                      type="url"
+                    />
+                  </div>
+                  {formData.external_link && (
+                    <p className="text-sm text-primary">
+                      ✓ Registration will redirect to external platform. "View Details" for completed events will also link externally.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -820,10 +850,14 @@ const HackathonForm = () => {
             <CollapsibleContent className="p-4 pt-0 space-y-4">
               {schedule.map((item, i) => (
                 <div key={i} className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
                     <div>
                       <Label>Day</Label>
                       <Input type="number" value={item.day} onChange={(e) => updateScheduleItem(i, "day", parseInt(e.target.value) || 1)} min={1} />
+                    </div>
+                    <div>
+                      <Label>Date (optional)</Label>
+                      <Input type="date" value={item.schedule_date} onChange={(e) => updateScheduleItem(i, "schedule_date", e.target.value)} />
                     </div>
                     <div>
                       <Label>Start Time</Label>
@@ -838,6 +872,7 @@ const HackathonForm = () => {
                       <Input value={item.title} onChange={(e) => updateScheduleItem(i, "title", e.target.value)} placeholder="Session title" />
                     </div>
                   </div>
+                  <p className="text-xs text-muted-foreground">If date is set, it will show date instead of "Day X"</p>
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <Label>Description</Label>

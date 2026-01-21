@@ -29,6 +29,7 @@ import Achievements from "./pages/admin/Achievements";
 import Sponsors from "./pages/admin/Sponsors";
 import Testimonials from "./pages/admin/Testimonials";
 import Content from "./pages/admin/Content";
+import UserManagement from "./pages/admin/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const App = () => (
             <Route path="/admin/sponsors" element={<Sponsors />} />
             <Route path="/admin/testimonials" element={<Testimonials />} />
             <Route path="/admin/content" element={<Content />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

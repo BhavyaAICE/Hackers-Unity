@@ -36,6 +36,7 @@ interface Event {
   registration_enabled: boolean;
   prize_pool: string | null;
   status: string | null;
+  external_link: string | null;
 }
 
 interface Challenge {
@@ -98,6 +99,7 @@ interface Winner {
 interface ScheduleItem {
   id: string;
   day: number;
+  schedule_date: string | null;
   start_time: string;
   end_time: string;
   title: string;
@@ -244,26 +246,29 @@ const HackathonDetail = () => {
     ...(faqs.length > 0 ? [{ id: "faqs", label: "FAQs" }] : []),
   ];
 
+  // Group schedule by date if available, otherwise by day
   const groupedSchedule = schedule.reduce((acc, item) => {
-    if (!acc[item.day]) acc[item.day] = [];
-    acc[item.day].push(item);
+    const key = item.schedule_date || `day-${item.day}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
     return acc;
-  }, {} as Record<number, ScheduleItem[]>);
+  }, {} as Record<string, ScheduleItem[]>);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Section with Banner */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         {event.banner_image && (
-          <>
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${event.banner_image})` }}
+          <div className="absolute inset-0 bg-muted">
+            <img
+              src={event.banner_image}
+              alt={event.title}
+              className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
-          </>
+            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/70 to-background" />
+          </div>
         )}
         {!event.banner_image && (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-background" />
@@ -577,11 +582,17 @@ const HackathonDetail = () => {
                     Schedule
                   </h2>
                   <div className="space-y-8">
-                    {Object.entries(groupedSchedule).map(([day, items]) => (
-                      <motion.div key={day} variants={fadeInUp}>
-                        <div className="inline-block bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-lg px-6 py-3 mb-6 font-bold">
-                          Day {day}
-                        </div>
+                    {Object.entries(groupedSchedule).map(([key, items]) => {
+                      const isDateKey = !key.startsWith('day-');
+                      const displayLabel = isDateKey 
+                        ? format(new Date(key), "d MMM yyyy")
+                        : `Day ${key.replace('day-', '')}`;
+                      
+                      return (
+                        <motion.div key={key} variants={fadeInUp}>
+                          <div className="inline-block bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-lg px-6 py-3 mb-6 font-bold">
+                            {displayLabel}
+                          </div>
                         <div className="space-y-4 ml-4 border-l-2 border-primary/30 pl-6">
                           {items.map((item) => (
                             <motion.div
@@ -604,7 +615,8 @@ const HackathonDetail = () => {
                           ))}
                         </div>
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </motion.div>
               </section>
@@ -841,12 +853,24 @@ const HackathonDetail = () => {
                 </div>
 
                 <div className="mt-8 space-y-3">
-                  {canRegister ? (
+                  {canRegister && event.external_link ? (
+                    <a href={event.external_link} target="_blank" rel="noopener noreferrer" className="block">
+                      <Button variant="hero" size="lg" className="w-full">
+                        Register Now <ExternalLink className="w-4 h-4 ml-2" />
+                      </Button>
+                    </a>
+                  ) : canRegister ? (
                     <Link to={`/events/${event.id}/register`} className="block">
                       <Button variant="hero" size="lg" className="w-full">
                         Register Now
                       </Button>
                     </Link>
+                  ) : isEventCompleted && event.external_link ? (
+                    <a href={event.external_link} target="_blank" rel="noopener noreferrer" className="block">
+                      <Button variant="outline" size="lg" className="w-full">
+                        View Event <ExternalLink className="w-4 h-4 ml-2" />
+                      </Button>
+                    </a>
                   ) : isEventCompleted ? (
                     <Button variant="outline" size="lg" className="w-full" disabled>
                       Event Completed
@@ -872,12 +896,24 @@ const HackathonDetail = () => {
       {/* Mobile Fixed Register Button */}
       <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-background border-t border-border p-4 z-50">
         <div className="container-custom">
-          {canRegister ? (
+          {canRegister && event.external_link ? (
+            <a href={event.external_link} target="_blank" rel="noopener noreferrer" className="block">
+              <Button variant="hero" size="lg" className="w-full uppercase font-bold tracking-wide">
+                Register Now <ExternalLink className="w-4 h-4 ml-2" />
+              </Button>
+            </a>
+          ) : canRegister ? (
             <Link to={`/events/${event.id}/register`} className="block">
               <Button variant="hero" size="lg" className="w-full uppercase font-bold tracking-wide">
                 Register Now
               </Button>
             </Link>
+          ) : isEventCompleted && event.external_link ? (
+            <a href={event.external_link} target="_blank" rel="noopener noreferrer" className="block">
+              <Button variant="outline" size="lg" className="w-full">
+                View Event <ExternalLink className="w-4 h-4 ml-2" />
+              </Button>
+            </a>
           ) : isEventCompleted ? (
             <Button variant="outline" size="lg" className="w-full" disabled>
               Event Completed

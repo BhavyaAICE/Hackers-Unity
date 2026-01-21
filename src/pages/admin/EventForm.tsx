@@ -58,6 +58,7 @@ const EventForm = () => {
     thumbnail_image: "",
     registration_enabled: true,
     benefits_text: "",
+    external_link: "",
   });
 
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -100,6 +101,7 @@ const EventForm = () => {
       thumbnail_image: data.thumbnail_image || "",
       registration_enabled: data.registration_enabled ?? true,
       benefits_text: data.benefits_text || "",
+      external_link: data.external_link || "",
     });
 
     const { data: existingSpeakers } = await supabase
@@ -213,6 +215,7 @@ const EventForm = () => {
         thumbnail_image: formData.thumbnail_image || null,
         registration_enabled: formData.registration_enabled,
         benefits_text: formData.benefits_text || null,
+        external_link: formData.external_link || null,
         created_by: user?.id,
       };
 
@@ -310,7 +313,7 @@ const EventForm = () => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_manage_events">
       <div className="max-w-4xl space-y-6">
         <div>
           <Button variant="ghost" onClick={() => navigate("/admin/events")} className="mb-4">
@@ -539,6 +542,31 @@ const EventForm = () => {
                 aspectRatio="banner"
                 description="Upload a high-quality banner image. It will be automatically optimized for web."
               />
+            </div>
+
+            {/* External Registration Link */}
+            <div className="p-4 bg-muted/50 rounded-lg space-y-4 mt-6">
+              <div>
+                <Label className="text-base font-semibold">External Registration</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  If registration is hosted on another platform (Devfolio, DoraHacks, etc.), add the link below. 
+                  Users will be redirected there for registration and event details.
+                </p>
+              </div>
+              <div>
+                <Label>External Link (Optional)</Label>
+                <Input
+                  value={formData.external_link}
+                  onChange={(e) => setFormData({ ...formData, external_link: e.target.value })}
+                  placeholder="e.g., https://devfolio.co/event-name or https://lu.ma/..."
+                  type="url"
+                />
+              </div>
+              {formData.external_link && (
+                <p className="text-sm text-primary">
+                  ✓ Registration will redirect to external platform. "View Details" for completed events will also link externally.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 mt-6">

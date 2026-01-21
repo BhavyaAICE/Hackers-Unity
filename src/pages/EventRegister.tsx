@@ -199,26 +199,18 @@ const EventRegister = () => {
     }
 
     try {
-      const emailResponse = await fetch(
-        `https://eqcjttvmjhisyrvtydat.supabase.co/functions/v1/send-registration-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxY2p0dHZtamhpc3lydnR5ZGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDEyMjYsImV4cCI6MjA4MDc3NzIyNn0.4m61Hbx0_K_FwovIKiubvJDMWaXCQV_1ZpB5zitWTME`,
-          },
-          body: JSON.stringify({
-            to: formData.email,
-            userName: formData.full_name,
-            eventType: eventData?.event_type || "Event",
-            eventTitle: eventData?.title || event.title,
-          }),
-        }
-      );
+      // Use Supabase client to invoke edge function (no hardcoded keys)
+      const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
+        body: {
+          to: formData.email,
+          userName: formData.full_name,
+          eventType: eventData?.event_type || "Event",
+          eventTitle: eventData?.title || event.title,
+        },
+      });
 
-      if (!emailResponse.ok) {
-        const errorData = await emailResponse.json();
-        console.error("Failed to send confirmation email:", errorData);
+      if (emailError) {
+        console.error("Failed to send confirmation email:", emailError);
       }
     } catch (emailError) {
       console.error("Error sending email:", emailError);

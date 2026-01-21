@@ -178,7 +178,7 @@ const Content = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
+      <AdminLayout requiredPermission="can_manage_content">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-64 bg-muted rounded" />
           <div className="h-96 bg-muted rounded-xl" />
@@ -188,7 +188,7 @@ const Content = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredPermission="can_manage_content">
       <div className="space-y-6 max-w-4xl">
         <div className="flex justify-between items-center">
           <div>
