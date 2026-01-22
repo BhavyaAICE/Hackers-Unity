@@ -1,10 +1,1 @@
 project_id = "eqcjttvmjhisyrvtydat"
-
-[functions.send-registration-email]
-verify_jwt = false
-
-[functions.send-permission-invite]
-verify_jwt = false
-
-[functions.send-auth-email]
-verify_jwt = false

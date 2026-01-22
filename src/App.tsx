@@ -18,6 +18,11 @@ import EventRegister from "./pages/EventRegister";
 import Dashboard from "./pages/Dashboard";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Workshops from "./pages/Workshops";
+import AboutUs from "./pages/AboutUs";
+import Careers from "./pages/Careers";
+import FAQs from "./pages/FAQs";
+import Support from "./pages/Support";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Events from "./pages/admin/Events";
 import EventForm from "./pages/admin/EventForm";
@@ -56,6 +61,11 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/workshops" element={<Workshops />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/faqs" element={<FAQs />} />
+            <Route path="/support" element={<Support />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/hackathons" element={<HackathonsList />} />
             <Route path="/admin/hackathons/create" element={<HackathonForm />} />

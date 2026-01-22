@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,19 +16,107 @@ import {
 } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/hackers-unity-logo.png";
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  href: string;
+  isRoute: boolean;
+  checkData?: string; // Table name to check for data
+}
+
+const baseNavLinks: NavLink[] = [
   { name: "Home", href: "/", isRoute: true },
   { name: "Achievements", href: "#achievements", isRoute: false },
-  { name: "Events", href: "#events", isRoute: false },
+  { name: "Events", href: "#events", isRoute: false, checkData: "events" },
+  { name: "Hackathons", href: "#hackathons", isRoute: false },
   { name: "Sponsors", href: "#sponsors", isRoute: false },
-  { name: "Hackathons", href: "/hackathons", isRoute: true },
-  { name: "Partners", href: "#contact", isRoute: false },
+  { name: "Testimonials", href: "#testimonials", isRoute: false, checkData: "testimonials" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [visibleLinks, setVisibleLinks] = useState<NavLink[]>([]);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkDataAvailability = async () => {
+      // Check events (non-hackathon)
+      const { data: eventsData } = await supabase
+        .from("events")
+        .select("id")
+        .neq("event_type", "hackathon")
+        .limit(1);
+
+      // Check testimonials
+      const { data: testimonialsData } = await supabase
+        .from("testimonials")
+        .select("id")
+        .eq("is_active", true)
+        .limit(1);
+
+      const hasEvents = eventsData && eventsData.length > 0;
+      const hasTestimonials = testimonialsData && testimonialsData.length > 0;
+
+      // Filter links based on data availability
+      const filtered = baseNavLinks.filter((link) => {
+        if (link.checkData === "events") return hasEvents;
+        if (link.checkData === "testimonials") return hasTestimonials;
+        return true;
+      });
+
+      setVisibleLinks(filtered);
+    };
+
+    checkDataAvailability();
+  }, []);
+
+  const handleNavClick = (e: React.MouseEvent, link: NavLink) => {
+    setIsOpen(false);
+
+    if (link.name === "Home" || link.name === "About Us") {
+      e.preventDefault();
+      if (location.pathname !== "/") {
+        navigate("/");
+        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    if (!link.isRoute && link.href.startsWith("#")) {
+      e.preventDefault();
+      const sectionId = link.href.substring(1);
+      
+      if (location.pathname !== "/") {
+        // Navigate to home first, then scroll to section
+        navigate("/");
+        setTimeout(() => {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 100);
+      } else {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+  };
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <motion.nav
@@ -39,7 +128,7 @@ const Navbar = () => {
       <div className="container-custom">
         <div className="flex items-center justify-between h-20 relative">
           {/* Logo - Left */}
-          <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+          <a href="/" onClick={handleLogoClick} className="flex items-center gap-3 group flex-shrink-0">
             <img 
               src={logo} 
               alt="Hacker's Unity" 
@@ -47,15 +136,16 @@ const Navbar = () => {
               height={48}
               className="h-12 w-auto transition-transform group-hover:scale-105"
             />
-          </Link>
+          </a>
 
           {/* Desktop Navigation - Center */}
           <div className="hidden lg:flex items-center justify-center gap-8 absolute left-1/2 -translate-x-1/2">
-            {navLinks.map((link) => (
+            {visibleLinks.map((link) => (
               link.isRoute ? (
                 <Link
                   key={link.name}
                   to={link.href}
+                  onClick={(e) => handleNavClick(e, link)}
                   className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium relative group whitespace-nowrap"
                 >
                   {link.name}
@@ -65,6 +155,7 @@ const Navbar = () => {
                 <a
                   key={link.name}
                   href={link.href}
+                  onClick={(e) => handleNavClick(e, link)}
                   className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium relative group whitespace-nowrap"
                 >
                   {link.name}
@@ -153,13 +244,13 @@ const Navbar = () => {
             className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border"
           >
             <div className="container-custom py-6 flex flex-col gap-4">
-              {navLinks.map((link) => (
+              {visibleLinks.map((link) => (
                 link.isRoute ? (
                   <Link
                     key={link.name}
                     to={link.href}
                     className="text-muted-foreground hover:text-foreground transition-colors py-2 font-medium"
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => handleNavClick(e, link)}
                   >
                     {link.name}
                   </Link>
@@ -168,7 +259,7 @@ const Navbar = () => {
                     key={link.name}
                     href={link.href}
                     className="text-muted-foreground hover:text-foreground transition-colors py-2 font-medium"
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => handleNavClick(e, link)}
                   >
                     {link.name}
                   </a>

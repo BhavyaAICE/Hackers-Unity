@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Trophy, Users, BookOpen, Globe, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const categories = [
   {
@@ -8,7 +9,8 @@ const categories = [
     title: "Hackathons",
     description: "Compete in coding challenges, build innovative solutions, and win exciting prizes",
     color: "from-primary to-cyan-400",
-    href: "#hackathons",
+    href: "/hackathons",
+    isRoute: true,
   },
   {
     icon: BookOpen,
@@ -16,20 +18,24 @@ const categories = [
     description: "Accelerate your career with industry-led training programs and certifications",
     color: "from-secondary to-purple-400",
     href: "#programs",
+    isRoute: false,
   },
   {
     icon: Users,
     title: "Workshops",
     description: "Hands-on sessions covering the latest technologies from AI to Web3",
     color: "from-accent to-pink-400",
-    href: "#workshops",
+    href: "/workshops",
+    isRoute: true,
   },
   {
     icon: Globe,
     title: "Community",
     description: "Connect with 100K+ developers, share knowledge, and grow together",
     color: "from-emerald-500 to-teal-400",
-    href: "#community",
+    href: "https://discord.gg/BmMJFpPe9T",
+    isRoute: false,
+    isExternal: true,
   },
 ];
 
@@ -69,15 +75,8 @@ const CategoriesSection = () => {
 
         {/* Category Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category, index) => (
-            <motion.a
-              key={category.title}
-              href={category.href}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-            >
+          {categories.map((category, index) => {
+            const cardContent = (
               <Card variant="neon" className="p-6 h-full group cursor-pointer hover:-translate-y-2">
                 <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                   <category.icon className="w-7 h-7 text-primary-foreground" />
@@ -93,8 +92,28 @@ const CategoriesSection = () => {
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Card>
-            </motion.a>
-          ))}
+            );
+
+            return (
+              <motion.div
+                key={category.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                {category.isRoute ? (
+                  <Link to={category.href} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+                    {cardContent}
+                  </Link>
+                ) : category.isExternal ? (
+                  <a href={category.href} target="_blank" rel="noopener noreferrer">{cardContent}</a>
+                ) : (
+                  <a href={category.href}>{cardContent}</a>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
