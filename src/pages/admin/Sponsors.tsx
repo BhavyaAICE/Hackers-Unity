@@ -59,16 +59,18 @@ const Sponsors = () => {
   };
 
   const handleAdd = () => {
-    const newSponsor: Sponsor = {
-      _id: `temp-${Date.now()}`,
-      name: "New Sponsor",
-      logoUrl: "",
-      websiteUrl: null,
-      tier: "partner",
-      displayOrder: sponsors.length + 1,
-      isActive: true,
-    };
-    setSponsors([...sponsors, newSponsor]);
+    setSponsors((prev) => {
+      const newSponsor: Sponsor = {
+        _id: `temp-${Date.now()}`,
+        name: "New Sponsor",
+        logoUrl: "",
+        websiteUrl: null,
+        tier: "partner",
+        displayOrder: prev.length + 1,
+        isActive: true,
+      };
+      return [...prev, newSponsor];
+    });
   };
 
   const handleUpdate = (_id: string, field: keyof Sponsor, value: any) => {
@@ -92,7 +94,7 @@ const Sponsors = () => {
         }
       }
       toast.success("Sponsors saved successfully");
-      fetchSponsors();
+      await fetchSponsors(); // await so state is fresh before user can interact
     } catch (error: any) {
       toast.error(error.message || "Failed to save sponsors");
     } finally {
