@@ -167,14 +167,60 @@ const HackathonDetail = () => {
   const fetchHackathon = async () => {
     try {
       const { event: data } = await api.get<{ event: any }>(`/api/hackathons/${id}`);
-      setEvent(data);
-      setChallenges((data.challenges || []).filter((c: any) => c.isActive));
-      setMentors((data.mentors || []).filter((m: any) => m.isActive));
-      setJury((data.jury || []).filter((j: any) => j.isActive));
-      setPrizes((data.prizes || []).filter((p: any) => p.isActive));
-      setFaqs((data.faqs || []).filter((f: any) => f.isActive));
-      setWinners(data.winners || []);
-      setSchedule(data.schedule || []);
+
+      // Remap camelCase MongoDB fields → snake_case local interface
+      setEvent({
+        id: data._id,
+        title: data.title,
+        subtitle: data.subtitle ?? null,
+        description: data.description ?? null,
+        event_type: data.eventType ?? 'hackathon',
+        event_date: data.eventDate ?? null,
+        event_end_date: data.eventEndDate ?? null,
+        registration_deadline: data.registrationDeadline ?? null,
+        duration_days: data.durationDays ?? 1,
+        timing: data.timing ?? null,
+        location_type: data.locationType ?? null,
+        location_name: data.locationName ?? null,
+        location_address: data.locationAddress ?? null,
+        banner_image: data.bannerImage ?? null,
+        registration_count: data.registrationCount ?? 0,
+        registration_enabled: data.registrationEnabled ?? false,
+        prize_pool: data.prizePool ?? null,
+        status: data.status ?? null,
+        external_link: data.externalLink ?? null,
+      });
+
+      // Remap sub-document fields too
+      setChallenges((data.challenges || []).filter((c: any) => c.isActive).map((c: any) => ({
+        id: c._id, title: c.title, description: c.description ?? null,
+        icon: c.icon ?? null, image_url: c.imageUrl ?? null, detailed_description: c.detailedDescription ?? null,
+      })));
+      setMentors((data.mentors || []).filter((m: any) => m.isActive).map((m: any) => ({
+        id: m._id, name: m.name, title: m.title ?? null, organization: m.organization ?? null,
+        avatar_url: m.avatarUrl ?? null, linkedin_url: m.linkedinUrl ?? null, bio: m.bio ?? null,
+      })));
+      setJury((data.jury || []).filter((j: any) => j.isActive).map((j: any) => ({
+        id: j._id, name: j.name, title: j.title ?? null, organization: j.organization ?? null,
+        avatar_url: j.avatarUrl ?? null, linkedin_url: j.linkedinUrl ?? null, bio: j.bio ?? null,
+      })));
+      setPrizes((data.prizes || []).filter((p: any) => p.isActive).map((p: any) => ({
+        id: p._id, position: p.position, title: p.title ?? null,
+        prize_amount: p.prizeAmount ?? null, description: p.description ?? null, icon_url: p.iconUrl ?? null,
+      })));
+      setFaqs((data.faqs || []).filter((f: any) => f.isActive).map((f: any) => ({
+        id: f._id, question: f.question, answer: f.answer,
+      })));
+      setWinners((data.winners || []).map((w: any) => ({
+        id: w._id, position: w.position, team_name: w.teamName, project_name: w.projectName,
+        project_description: w.projectDescription ?? null, members: w.members ?? null,
+        prize_won: w.prizeWon ?? null, image_url: w.imageUrl ?? null,
+        github_url: w.githubUrl ?? null, project_url: w.projectUrl ?? null,
+      })));
+      setSchedule((data.schedule || []).map((s: any) => ({
+        id: s._id, day: s.day, schedule_date: s.scheduleDate ?? null,
+        start_time: s.startTime ?? '', end_time: s.endTime ?? '', title: s.title, description: s.description ?? null,
+      })));
     } catch (err: any) {
       toast.error(err.message || "Failed to load hackathon details.");
     } finally {
