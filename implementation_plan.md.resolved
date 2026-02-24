@@ -1,0 +1,183 @@
+# Supabase → MongoDB Migration Plan
+
+This project currently uses **Supabase** for two distinct things:
+1. **Authentication** – email/password sign-up, Google OAuth, sessions, password reset, email confirmation
+2. **Database** – 10+ tables (events, hackathons, user_profiles, registrations, etc.) queried directly from the frontend via the `@supabase/supabase-js` SDK
+
+Migrating to MongoDB means we need to replace **both**. Since MongoDB has no built-in auth system, we will introduce a lightweight **Express.js + Node.js backend** that sits between the React frontend and MongoDB Atlas.
+
+---
+
+## Architecture After Migration
+
+```
+React Frontend (Vite)
+        │
+        │  HTTP REST calls (fetch / axios)
+        ▼
+Express.js API Server  ←──── JWT Auth (jsonwebtoken)
+        │
+        ▼
+MongoDB Atlas (Mongoose ODM)
+```
+
+> [!IMPORTANT]
+> This migration requires building a **new backend server**. Currently all database access happens from the browser directly via Supabase. After migration, the frontend will call your own REST API instead.
+
+---
+
+## User Review Required
+
+> [!WARNING]
+> **Google OAuth**: Supabase handled Google sign-in automatically. With MongoDB, you must set up your own Google OAuth credentials (Client ID & Secret) and handle the OAuth callback in the new Express backend. This requires a Google Cloud Console project.
+
+> [!CAUTION]
+> **Email sending** (confirmation emails, password resets): Supabase handled these automatically. With this migration, you keep using your existing `RESEND_API_KEY` but you must wire it into the Express backend manually.
+
+> [!NOTE]
+> **Scope Decision**: The migration is large. We recommend doing it in 5 phases over multiple sessions so the app stays working throughout. This plan covers all phases with details on what changes in each.
+
+---
+
+## Proposed Changes — 5 Phases
+
+---
+
+### Phase 1 — New Express Backend
+
+#### [NEW] `backend/server.js`
+Main Express app entry point. Sets up CORS, JSON body parser, routes, and starts the server.
+
+#### [NEW] `backend/config/db.js`
+Connects to MongoDB Atlas using Mongoose. Reads `MONGODB_URI` from env.
+
+#### [NEW] `backend/models/` (one file per Supabase table)
+Mongoose schemas replacing the 27 SQL migration files:
+- `User.js` — replaces `user_profiles` table
+- `Event.js` — replaces `events` table
+- `Hackathon.js` — replaces `hackathons` table
+- `HackathonChallenge.js` — replaces `hackathon_challenges` table
+- `Registration.js` — replaces `registrations` table
+- `Team.js` — replaces `teams` table
+- `Submission.js` — replaces `submissions` table
+- `Sponsor.js`, `Achievement.js`, `Speaker.js`, `Testimonial.js`, etc.
+
+#### [NEW] `backend/routes/` — REST API routes
+- `auth.routes.js` — `/api/auth/signup`, `/api/auth/login`, `/api/auth/google`, `/api/auth/logout`, `/api/auth/reset-password`
+- `events.routes.js` — CRUD for events
+- `hackathons.routes.js` — CRUD for hackathons + challenges
+- `registrations.routes.js` — Registration management
+- `admin.routes.js` — Admin-only endpoints (permissions, user management)
+- `users.routes.js` — User profile endpoints
+
+#### [NEW] `backend/middleware/auth.middleware.js`
+JWT verification middleware. Replaces Supabase's RLS — every protected route checks a JWT token.
+
+#### [NEW] `backend/.env`
+```
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/hackersunity
+JWT_SECRET=<a-long-random-secret>
+RESEND_API_KEY=re_hrJFwoSF_...   # same as current .env
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
+
+---
+
+### Phase 2 — Frontend Auth Layer Replacement
+
+#### [MODIFY] [AuthContext.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/contexts/AuthContext.tsx)
+Replace all `supabase.auth.*` calls with [fetch('/api/auth/...')](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/usePermissions.ts#41-66) calls to the new Express backend. Store JWT token in `localStorage` instead of Supabase session.
+
+#### [MODIFY] [client.ts](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/integrations/supabase/client.ts)
+Replace with a simple `apiClient.ts` that is a pre-configured [fetch](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/usePermissions.ts#41-66) wrapper pointing at the Express backend URL.
+
+#### [MODIFY] [useAdmin.ts](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/useAdmin.ts)
+Replace `supabase.from('user_profiles')` with [fetch('/api/users/me')](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/usePermissions.ts#41-66).
+
+#### [MODIFY] [usePermissions.ts](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/usePermissions.ts)
+Replace `supabase.rpc('get_user_permissions')` with [fetch('/api/admin/permissions')](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/hooks/usePermissions.ts#41-66).
+
+---
+
+### Phase 3 — Frontend Pages Replacement
+
+All pages in `src/pages/` that currently call Supabase directly will be updated to call the new REST API. Files affected:
+
+| File | Current Supabase Usage |
+|------|----------------------|
+| [Dashboard.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/Dashboard.tsx) | User stats, registrations |
+| [AllEvents.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/AllEvents.tsx) | `supabase.from('events').select(...)` |
+| [EventDetail.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/EventDetail.tsx) | Event + speaker fetch |
+| [EventRegister.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/EventRegister.tsx) | Registration insert |
+| [AllHackathons.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/AllHackathons.tsx) | Hackathon list |
+| [HackathonDetail.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/HackathonDetail.tsx) | Challenges, teams, submissions |
+| [Login.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/Login.tsx) | Auth |
+| [Register.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/Register.tsx) | Auth |
+| [ForgotPassword.tsx](file:///c:/Users/Bhavy/Desktop/Hackers-Unity-main/src/pages/ForgotPassword.tsx) | Auth |
+| `src/pages/admin/*` (12 files) | Admin queries |
+
+#### [DELETE] `src/integrations/supabase/types.ts`
+The 34,000-byte auto-generated Supabase type file. Replaced with TypeScript interfaces matching MongoDB models.
+
+#### [NEW] `src/types/api.types.ts`
+TypeScript interfaces for all MongoDB API responses.
+
+---
+
+### Phase 4 — Data Migration (Supabase → MongoDB Atlas)
+
+#### [NEW] `scripts/migrate-data.js`
+A one-time Node.js script that:
+1. Reads all data from Supabase using the service role key (already in `.env`)
+2. Transforms the data (UUIDs → MongoDB ObjectIds, relationships, etc.)
+3. Inserts into MongoDB Atlas
+
+Run once: `node scripts/migrate-data.js`
+
+---
+
+### Phase 5 — Cleanup
+
+- Remove `@supabase/supabase-js` from `package.json`
+- Delete `supabase/` directory (migrations no longer needed)
+- Update `.env` — remove `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE`
+- Add `VITE_API_URL=http://localhost:4000` for local dev
+- Update `vercel.json` to proxy API requests if deploying backend on Vercel
+
+---
+
+## Verification Plan
+
+### Phase 1 — Backend
+```bash
+cd backend
+node server.js
+# Should print: "MongoDB connected" and "Server running on port 4000"
+```
+
+Then test with curl or Postman:
+```bash
+curl -X POST http://localhost:4000/api/auth/signup -H "Content-Type: application/json" -d '{"email":"test@test.com","password":"Test1234","fullName":"Test User"}'
+# Should return: { token: "...", user: { ... } }
+```
+
+### Phase 2 — Auth Flow (Browser)
+Run frontend: `npm run dev`
+1. Go to `/register` → create account → should land on homepage
+2. Go to `/login` → sign in → should work and redirect correctly
+3. Click logout → should redirect to `/login`
+4. Go to `/forgot-password` → enter email → should show "check your email" message
+
+### Phase 3 — Pages (Browser)
+1. Go to `/events` → events list should load (from MongoDB)
+2. Go to `/hackathons` → hackathons list should load
+3. Register for an event → check MongoDB to confirm document was inserted
+4. Admin login → go to `/admin` → admin dashboard should load with data
+
+### Phase 4 — Data Migration
+```bash
+node scripts/migrate-data.js
+# Should print: "Migrated X events, Y hackathons, Z users..."
+```
+Then verify in MongoDB Atlas dashboard that collections have the correct number of documents.
