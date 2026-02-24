@@ -1,10 +1,10 @@
 // API client — replaces the Supabase client
 // All requests go to the Express backend
 
-// In production (Vercel), VITE_API_URL is intentionally left empty so all
-// requests use relative paths (/api/...) on the same domain — no CORS needed.
-// In local dev, set VITE_API_URL=http://localhost:4000 in .env.local
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+// In production (Vercel), VITE_API_URL is not set, so we default to '' (relative
+// paths like /api/...) which routes to the serverless function on the same domain.
+// In local dev, we default to http://localhost:4000
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : '');
 
 const getToken = () => localStorage.getItem('auth_token');
 

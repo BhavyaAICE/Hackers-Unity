@@ -67,8 +67,8 @@ async function uploadVariant(
   formData.append('file', file);
 
   const authToken = token || localStorage.getItem('auth_token') || '';
-  // In production VITE_API_URL is empty — requests go to /api/... on same Vercel domain
-  const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+  // In production VITE_API_URL is not set — use relative /api/... paths on same Vercel domain
+  const apiBase = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : '');
 
   const res = await fetch(
     `${apiBase}/api/upload?variant=${variant}&prefix=${encodeURIComponent(prefix)}`,
@@ -143,8 +143,8 @@ export async function processAndUploadImage(
 // Delete an uploaded image via backend
 export async function deleteImage(storagePath: string): Promise<void> {
   const authToken = localStorage.getItem('auth_token') || '';
-  // In production VITE_API_URL is empty — requests go to /api/... on same Vercel domain
-  const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+  // In production VITE_API_URL is not set — use relative /api/... paths on same Vercel domain
+  const apiBase = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : '');
 
   await fetch(`${apiBase}/api/upload?path=${encodeURIComponent(storagePath)}`, {
     method: 'DELETE',
