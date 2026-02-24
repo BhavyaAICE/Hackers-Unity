@@ -30,7 +30,7 @@ const websiteContentSchema = new mongoose.Schema({
     title: String,
     subtitle: String,
     description: String,
-    content: { type: Map, of: mongoose.Schema.Types.Mixed, default: {} },
+    content: { type: mongoose.Schema.Types.Mixed, default: {} },
     isActive: { type: Boolean, default: true },
     displayOrder: { type: Number, default: 0 },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

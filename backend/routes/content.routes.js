@@ -133,9 +133,7 @@ router.get('/pages/:pageKey', async (req, res) => {
     try {
         const section = await WebsiteContent.findOne({ sectionKey: `page_${req.params.pageKey}`, isActive: true });
         if (!section) return res.json({ content: {} });
-        const contentObj = {};
-        if (section.content) section.content.forEach((v, k) => { contentObj[k] = v; });
-        res.json({ content: contentObj });
+        res.json({ content: section.content || {} });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -145,15 +143,12 @@ router.put('/pages/:pageKey', protect, requirePermission('canManageContent'), as
         if (!section) {
             section = new WebsiteContent({ sectionKey: `page_${req.params.pageKey}`, title: `Page: ${req.params.pageKey}`, isActive: true });
         }
-        section.content = new Map();
-        for (const [k, v] of Object.entries(req.body.content || {})) {
-            section.content.set(k, v);
-        }
+        // Use plain object assignment — Mixed type supports dot-notation keys unlike Map
+        section.content = { ...(req.body.content || {}) };
+        section.markModified('content'); // Required for Mongoose to detect Mixed field changes
         section.updatedBy = req.user._id;
         await section.save();
-        const contentObj = {};
-        section.content.forEach((v, k) => { contentObj[k] = v; });
-        res.json({ content: contentObj });
+        res.json({ content: section.content });
     } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
