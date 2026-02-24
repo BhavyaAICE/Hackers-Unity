@@ -30,17 +30,17 @@ const AllHackathons = () => {
   };
 
   const getHackathonStatus = (hackathon: ApiHackathon) => {
-    const eventEndDate = hackathon.endDate || hackathon.startDate;
-    if (eventEndDate && isPast(new Date(eventEndDate))) {
-      return { status: "completed", label: "Completed", canRegister: false };
+    // Use status field directly from the Event model
+    if (hackathon.status === 'completed' || hackathon.status === 'cancelled') {
+      return { status: 'completed', label: 'Completed', canRegister: false };
     }
     if (hackathon.registrationDeadline && isPast(new Date(hackathon.registrationDeadline))) {
-      return { status: "registration-closed", label: "Registration Closed", canRegister: false };
+      return { status: 'registration-closed', label: 'Registration Closed', canRegister: false };
     }
     if (hackathon.registrationEnabled) {
-      return { status: "registering", label: "Register Now", canRegister: true };
+      return { status: 'registering', label: 'Register Now', canRegister: true };
     }
-    return { status: "coming-soon", label: "Coming Soon", canRegister: false };
+    return { status: 'coming-soon', label: 'Coming Soon', canRegister: false };
   };
 
   const getDaysLeft = (deadline: string | null | undefined) => {
@@ -129,12 +129,12 @@ const AllHackathons = () => {
                         {/* Status Badge */}
                         <div
                           className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold ${status === "registering"
-                              ? "bg-primary text-primary-foreground"
-                              : status === "completed"
-                                ? "bg-green-500 text-white"
-                                : status === "registration-closed"
-                                  ? "bg-destructive text-destructive-foreground"
-                                  : "bg-secondary text-secondary-foreground"
+                            ? "bg-primary text-primary-foreground"
+                            : status === "completed"
+                              ? "bg-green-500 text-white"
+                              : status === "registration-closed"
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-secondary text-secondary-foreground"
                             }`}
                         >
                           {status === "completed"
@@ -157,10 +157,10 @@ const AllHackathons = () => {
                         </h3>
 
                         <div className="space-y-2 text-sm text-muted-foreground flex-1">
-                          {hackathon.startDate && (
+                          {hackathon.eventDate && (
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4 text-primary" />
-                              {format(new Date(hackathon.startDate), "MMM d, yyyy")}
+                              {format(new Date(hackathon.eventDate), "MMM d, yyyy")}
                             </div>
                           )}
                           {hackathon.locationName && (

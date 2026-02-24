@@ -67,27 +67,31 @@ export interface ApiHackathon {
     title: string;
     subtitle?: string;
     description?: string;
-    status: 'upcoming' | 'registration_open' | 'ongoing' | 'judging' | 'completed' | 'cancelled';
-    startDate?: string;
-    endDate?: string;
+    eventType: 'hackathon';
+    status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+    eventDate?: string;       // was startDate in old Hackathon model
+    eventEndDate?: string;    // was endDate in old Hackathon model
     registrationDeadline?: string;
+    durationDays?: number;
+    timing?: string;
     locationType?: string;
     locationName?: string;
+    locationAddress?: string;
     bannerImage?: string;
     thumbnailImage?: string;
     prizePool?: string;
-    firstPrize?: string;
-    secondPrize?: string;
-    thirdPrize?: string;
     maxParticipants?: number;
-    maxTeamSize: number;
-    minTeamSize: number;
     registrationEnabled: boolean;
     registrationCount: number;
-    themes?: string[];
-    tags?: string[];
-    technologies?: string[];
     externalLink?: string;
+    tags?: string[];
+    challenges?: any[];
+    mentors?: any[];
+    jury?: any[];
+    prizes?: any[];
+    faqs?: any[];
+    winners?: any[];
+    schedule?: any[];
     createdAt: string;
     updatedAt: string;
 }
