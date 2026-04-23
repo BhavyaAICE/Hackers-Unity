@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Trophy, Users, Building2, Calendar, ArrowRight, Sparkles, Award, Target, Rocket, Star } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, useInView } from "framer-motion";
+import { Trophy, Users, Building2, Calendar, ArrowRight, Award, Target, Rocket, Star, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { api } from "@/lib/apiClient";
 
 interface Achievement {
@@ -25,16 +26,209 @@ const iconMap: Record<string, React.ElementType> = {
   star: Star,
 };
 
-const styleMap: Record<string, { gradient: string; glow: string }> = {
-  trophy: { gradient: "from-yellow-400 to-orange-500", glow: "hover:shadow-yellow-500/20" },
-  users: { gradient: "from-blue-400 to-cyan-500", glow: "hover:shadow-blue-500/20" },
-  star: { gradient: "from-purple-400 to-pink-500", glow: "hover:shadow-purple-500/20" },
-  building2: { gradient: "from-green-400 to-emerald-500", glow: "hover:shadow-green-500/20" },
-  award: { gradient: "from-red-400 to-rose-500", glow: "hover:shadow-red-500/20" },
-  rocket: { gradient: "from-indigo-400 to-violet-500", glow: "hover:shadow-indigo-500/20" },
-  calendar: { gradient: "from-teal-400 to-cyan-500", glow: "hover:shadow-teal-500/20" },
-  default: { gradient: "from-primary to-secondary", glow: "hover:shadow-primary/20" },
-};
+const ACCENT_COLOR = "hsl(var(--primary))";
+
+function useAnimatedCounter(target: number, isInView: boolean, duration: number = 2000) {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
+  useEffect(() => {
+    if (!isInView || hasAnimated.current || target === 0) return;
+    hasAnimated.current = true;
+    const steps = 60;
+    const stepDuration = duration / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      const progress = current / steps;
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (current >= steps) { setCount(target); clearInterval(interval); }
+    }, stepDuration);
+    return () => clearInterval(interval);
+  }, [isInView, target, duration]);
+  return count;
+}
+
+function parseStatValue(val: string | null): { num: number } {
+  if (!val) return { num: 0 };
+  const cleaned = val.replace(/,/g, "");
+  const match = cleaned.match(/^([\d.]+)\s*([KkMm]?)/);
+  if (!match) return { num: 0 };
+  let num = parseFloat(match[1]);
+  const m = match[2].toUpperCase();
+  if (m === "K") num *= 1000;
+  else if (m === "M") num *= 1000000;
+  return { num };
+}
+
+function formatCount(count: number, originalValue: string | null): string {
+  if (!originalValue) return "0";
+  const cleaned = originalValue.replace(/,/g, "");
+  const match = cleaned.match(/^[\d.]+\s*([KkMm]?)\s*(\+?)(.*)$/);
+  if (!match) return originalValue;
+  const multiplier = match[1].toUpperCase();
+  const plus = match[2];
+  const rest = match[3];
+  if (multiplier === "K") return `${Math.round(count / 1000)}K${plus}${rest}`;
+  if (multiplier === "M") return `${(count / 1000000).toFixed(1)}M${plus}${rest}`;
+  return `${count}${plus}${rest}`;
+}
+
+function AchievementCard({ achievement, index }: { achievement: Achievement; index: number }) {
+  const ref = useRef<HTMLLIElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-30px" });
+  const key = achievement.category ?? "default";
+  const IconComponent = iconMap[key] ?? Trophy;
+  const { num } = parseStatValue(achievement.statsValue);
+  const count = useAnimatedCounter(num, isInView);
+
+  // 3D tilt state (from TiltCard)
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+  const [spotlight, setSpotlight] = useState({ x: 50, y: 50 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setTilt({ rotateX: (0.5 - y) * 20, rotateY: (x - 0.5) * 20 });
+    setSpotlight({ x: x * 100, y: y * 100 });
+  }, []);
+
+  const handleMouseEnter = useCallback(() => setIsHovering(true), []);
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ rotateX: 0, rotateY: 0 });
+    setIsHovering(false);
+  }, []);
+
+  return (
+    <motion.li
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: index * 0.12 }}
+      className="min-h-[14rem] list-none"
+      style={{ perspective: "1000px" }}
+    >
+      {/* 3D Tilt wrapper */}
+      <motion.div
+        ref={cardRef}
+        className="relative h-full cursor-pointer"
+        style={{ transformStyle: "preserve-3d" }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        animate={{ rotateX: tilt.rotateX, rotateY: tilt.rotateY }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-white/[0.08] p-2 md:rounded-[1.5rem] md:p-3">
+          {/* Conic gradient glow border (from Achievements) */}
+          <GlowingEffect
+            spread={40}
+            glow={true}
+            proximity={64}
+            inactiveZone={0.01}
+            borderWidth={3}
+          />
+
+          {/* Gradient shimmer border (from Explore Our Programs) */}
+          <div
+            className={`absolute -inset-[1px] rounded-[inherit] transition-opacity duration-500 ${isHovering ? "opacity-100" : "opacity-0"}`}
+            style={{
+              background: `linear-gradient(135deg, hsl(var(--primary) / 0.25), transparent 40%, transparent 60%, hsl(var(--primary) / 0.25))`,
+              backgroundSize: "200% 200%",
+              animation: isHovering ? "shimmer-border 3s ease infinite" : "none",
+            }}
+          />
+
+          {/* Card inner content */}
+          <div className="relative flex h-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border-[0.75px] border-white/[0.06] bg-background p-8 shadow-sm">
+            {/* Spotlight cursor follow (from Explore Our Programs) */}
+            <div
+              className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-300"
+              style={{
+                opacity: isHovering ? 1 : 0,
+                background: `radial-gradient(500px circle at ${spotlight.x}% ${spotlight.y}%, hsl(var(--primary) / 0.08), transparent 40%)`,
+              }}
+            />
+
+            {/* Inner radial glow (from Explore Our Programs) */}
+            <div
+              className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-500"
+              style={{
+                opacity: isHovering ? 0.6 : 0,
+                background: `radial-gradient(ellipse at 50% 100%, hsl(var(--primary) / 0.06), transparent 60%)`,
+              }}
+            />
+
+            {/* Floating particles (from Explore Our Programs) */}
+            {isHovering && (
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-1 h-1 rounded-full"
+                    initial={{ y: "110%" }}
+                    animate={{ y: "-10%", opacity: [0, 0.7, 0] }}
+                    transition={{
+                      duration: 2 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: i * 0.4,
+                      ease: "easeOut",
+                    }}
+                    style={{
+                      left: `${15 + i * 17}%`,
+                      backgroundColor: ACCENT_COLOR,
+                      opacity: 0.5,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Icon */}
+            <motion.div
+              className="relative z-10 w-fit rounded-lg border-[0.75px] border-white/[0.08] bg-muted/50 p-3"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            >
+              <IconComponent className="h-5 w-5 text-primary" />
+            </motion.div>
+
+            {/* Number */}
+            <motion.span
+              className="relative z-10 text-4xl md:text-5xl font-bold font-display text-foreground tracking-tight"
+              initial={{ scale: 0.8 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 200, damping: 15, delay: index * 0.12 + 0.2 }}
+            >
+              {isInView ? formatCount(count, achievement.statsValue) : "0"}
+            </motion.span>
+
+            {/* Label */}
+            <span className="relative z-10 text-muted-foreground text-sm uppercase tracking-wider font-medium text-center">
+              {achievement.statsLabel}
+            </span>
+          </div>
+        </div>
+
+        {/* Dynamic depth shadow (from Explore Our Programs) */}
+        <div
+          className="absolute -inset-1 rounded-[1.5rem] -z-10 transition-all duration-300 blur-xl"
+          style={{
+            opacity: isHovering ? 0.15 : 0,
+            background: ACCENT_COLOR,
+            transform: `translateX(${tilt.rotateY * 0.5}px) translateY(${-tilt.rotateX * 0.5}px)`,
+          }}
+        />
+      </motion.div>
+    </motion.li>
+  );
+}
 
 const AchievementsSection = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -55,108 +249,76 @@ const AchievementsSection = () => {
   }, []);
 
   if (loading) return null;
-
-  // Filter out records with no displayable data
   const visible = achievements.filter(a => a.statsValue || a.statsLabel);
   if (visible.length === 0) return null;
 
-  return (
-    <section className="py-24 relative overflow-hidden" id="achievements">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-50" />
+  // Determine grid layout based on count
+  const getGridClass = () => {
+    const count = visible.length;
+    if (count <= 2) return "grid-cols-1 sm:grid-cols-2";
+    if (count === 3) return "grid-cols-1 sm:grid-cols-3";
+    return "grid-cols-1 sm:grid-cols-2 md:grid-cols-4";
+  };
 
-      <div className="container-custom relative">
+  return (
+    <section className="py-28 relative overflow-hidden" id="achievements">
+      {/* Subtle background */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, hsl(var(--primary) / 0.03) 0%, transparent 70%)' }}
+      />
+
+      <div className="container-custom relative z-10">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-primary text-sm font-semibold uppercase tracking-wider inline-flex items-center gap-2">
-            <Sparkles className="w-4 h-4" />
+          <span className="text-primary text-sm font-semibold uppercase tracking-widest inline-flex items-center gap-2">
+            <Zap className="w-4 h-4" />
             Our Impact
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-display mt-4 mb-6">
-            Our <span className="text-primary">Achievements</span>
+            Our <span className="text-gradient">Achievements</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Building India's most vibrant tech community, one hackathon at a time
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16 auto-rows-fr">
-          {visible.map((achievement, index) => {
-            const key = achievement.category ?? "default";
-            const IconComponent = iconMap[key] ?? Trophy;
-            const { gradient, glow } = styleMap[key] ?? styleMap.default;
+        {/* EQUAL-SIZE GLOWING CARDS GRID */}
+        <ul className={`grid ${getGridClass()} gap-4 max-w-5xl mx-auto mb-16`}>
+          {visible.map((achievement, index) => (
+            <AchievementCard
+              key={achievement._id}
+              achievement={achievement}
+              index={index}
+            />
+          ))}
+        </ul>
 
-            return (
-              <motion.div
-                key={achievement._id}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative"
-              >
-                {/* Glow Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
-
-                <div className={`relative glass-card p-6 md:p-8 text-center rounded-2xl border border-border/50 hover:border-primary/50 transition-all duration-500 shadow-lg ${glow} group-hover:shadow-2xl h-full flex flex-col justify-center`}>
-                  {/* Icon */}
-                  <div className={`w-14 h-14 md:w-16 md:h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                    <IconComponent className="w-7 h-7 md:w-8 md:h-8 text-white" />
-                  </div>
-
-                  {/* Value */}
-                  <motion.div
-                    className={`text-3xl md:text-4xl font-bold font-display bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}
-                    initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    {achievement.statsValue}
-                  </motion.div>
-
-                  {/* Label */}
-                  <p className="text-muted-foreground text-sm md:text-base mt-2 font-medium">
-                    {achievement.statsLabel}
-                  </p>
-
-                  {/* Decorative Line */}
-                  <div className={`h-1 w-0 group-hover:w-full bg-gradient-to-r ${gradient} mx-auto mt-4 rounded-full transition-all duration-500`} />
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
           className="text-center"
         >
-          <div className="glass-card inline-block p-8 md:p-10 rounded-2xl max-w-xl mx-auto">
-            <h3 className="text-xl md:text-2xl font-bold font-display mb-3">
-              Ready to be part of something <span className="text-primary">amazing</span>?
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Join India's fastest-growing tech community and unlock endless opportunities
-            </p>
-            <a
-              href="https://discord.gg/2ArqYfykBd"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="hero" size="lg" className="group">
-                Join Our Community
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </a>
-          </div>
+          <h3 className="text-xl md:text-2xl font-bold font-display mb-3">
+            Ready to be part of something <span className="text-gradient">amazing</span>?
+          </h3>
+          <p className="text-muted-foreground mb-6">
+            Join India's fastest-growing tech community and unlock endless opportunities
+          </p>
+          <a href="https://discord.gg/2ArqYfykBd" target="_blank" rel="noopener noreferrer">
+            <Button variant="hero" size="lg" className="group">
+              Join Our Community
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </a>
         </motion.div>
       </div>
     </section>

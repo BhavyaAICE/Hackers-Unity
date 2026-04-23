@@ -102,7 +102,7 @@ const TestimonialsSection = () => {
   return (
     <section
       id="testimonials"
-      className="py-24 bg-gradient-to-b from-background to-muted/30 overflow-hidden"
+      className="py-24 bg-transparent overflow-hidden"
     >
       <div className="container-custom">
         {/* Header */}
@@ -200,8 +200,8 @@ const TestimonialsSection = () => {
                   setCurrentIndex(i);
                 }}
                 className={`rounded-full transition-all ${i === currentIndex
-                    ? "w-8 h-2 bg-primary"
-                    : "w-2 h-2 bg-muted-foreground/30"
+                  ? "w-8 h-2 bg-primary"
+                  : "w-2 h-2 bg-muted-foreground/30"
                   }`}
               />
             ))}

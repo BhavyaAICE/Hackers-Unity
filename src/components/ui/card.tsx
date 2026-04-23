@@ -10,8 +10,9 @@ const cardVariants = cva(
         default: "bg-card text-card-foreground border-border",
         glass: "bg-card/50 backdrop-blur-xl border-border/50",
         elevated: "bg-card text-card-foreground border-border shadow-xl hover:shadow-2xl hover:-translate-y-1",
-        neon: "bg-card/50 text-card-foreground border-primary/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/20",
+        neon: "bg-card/50 text-card-foreground border-primary/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/20 backdrop-blur-xl",
         gradient: "bg-gradient-to-br from-card to-muted text-card-foreground border-border/50",
+        premium: "bg-card/30 text-card-foreground border-primary/20 backdrop-blur-2xl hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-500",
       },
     },
     defaultVariants: {
@@ -22,7 +23,7 @@ const cardVariants = cva(
 
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+  VariantProps<typeof cardVariants> { }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant, ...props }, ref) => (

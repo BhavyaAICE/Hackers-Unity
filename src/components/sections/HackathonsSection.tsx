@@ -82,8 +82,8 @@ const HackathonsSection = () => {
   };
 
   return (
-    <section className="py-24 bg-background" id="hackathons">
-      <div className="container-custom">
+    <section className="py-24 bg-transparent" id="hackathons">
+      <div className="container-custom relative z-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <motion.span

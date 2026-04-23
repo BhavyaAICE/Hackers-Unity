@@ -38,10 +38,10 @@ const founders = [
 
 const FoundersSection = () => {
   return (
-    <section className="py-16 md:py-24 bg-background relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-transparent relative overflow-hidden">
       <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[hsl(270_100%_65%/0.1)] rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[hsl(199_89%_48%/0.08)] rounded-full blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">
@@ -75,7 +75,7 @@ const FoundersSection = () => {
             >
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-8 pt-10 text-center hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
                 <div className="relative mx-auto mb-8 w-40 h-40 md:w-48 md:h-48">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent p-1">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[hsl(199_89%_48%)] via-[hsl(250_76%_55%)] to-[hsl(270_100%_65%)] p-1">
                     <div className="w-full h-full rounded-full overflow-hidden bg-background">
                       <img src={founder.image} alt={founder.name} width={192} height={192} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
