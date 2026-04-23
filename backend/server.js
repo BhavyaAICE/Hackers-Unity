@@ -60,18 +60,26 @@ app.use(async (req, res, next) => {
 });
 
 // ─── Routes ────────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/hackathons', hackathonRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/content', contentRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/upload', uploadRoutes);
+const apiRouter = express.Router();
+
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/events', eventRoutes);
+apiRouter.use('/hackathons', hackathonRoutes);
+apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/content', contentRoutes);
+apiRouter.use('/users', userRoutes);
+apiRouter.use('/upload', uploadRoutes);
 
 // Health check (bypasses DB middleware — always responds)
-app.get('/api/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
 });
+
+// Mount for local dev (frontend calls /api/...)
+app.use('/api', apiRouter);
+
+// Mount for Vercel Services (where the /api prefix is stripped from the URL)
+app.use('/', apiRouter);
 
 // ─── 404 Handler ───────────────────────────────────────────────────────────
 app.use((req, res) => {
